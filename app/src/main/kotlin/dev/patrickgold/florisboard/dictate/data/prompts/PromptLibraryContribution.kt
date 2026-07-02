@@ -26,7 +26,9 @@ import java.util.Locale
 object PromptLibraryContribution {
 
     /** The controlled category vocabulary offered when contributing, matching the seed library. */
-    val CATEGORIES = listOf("Editing", "Tone", "Length", "Format", "Translation", "Fun")
+    val CATEGORIES = listOf(
+        "Editing", "Tone", "Length", "Format", "Translation", "Fun", "Tools", "Coding", "Social",
+    )
 
     /**
      * Builds the pre-filled GitHub "new file" URL for [model]. The submission file is a single
