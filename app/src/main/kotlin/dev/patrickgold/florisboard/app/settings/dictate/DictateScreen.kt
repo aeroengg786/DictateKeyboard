@@ -265,6 +265,12 @@ fun DictateScreen() = FlorisScreen {
                 summary = stringRes(R.string.dictate__keep_screen_awake_summary),
             )
             SwitchPreference(
+                prefs.dictate.skipSilentRecordings,
+                icon = Icons.Default.VolumeOff,
+                title = stringRes(R.string.dictate__skip_silent_title),
+                summary = stringRes(R.string.dictate__skip_silent_summary),
+            )
+            SwitchPreference(
                 prefs.dictate.instantRecording,
                 icon = Icons.Default.Bolt,
                 title = stringRes(R.string.dictate__instant_recording_title),

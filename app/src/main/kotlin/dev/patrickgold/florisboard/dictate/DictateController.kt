@@ -32,6 +32,7 @@ import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.dictate.audio.AudioConcat
 import dev.patrickgold.florisboard.dictate.audio.BluetoothMicRouter
 import dev.patrickgold.florisboard.dictate.audio.RecordingController
+import dev.patrickgold.florisboard.dictate.audio.SpeechGate
 import dev.patrickgold.florisboard.dictate.data.prompts.DictatePromptDefaults
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptModel
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
@@ -599,7 +600,8 @@ object DictateController {
         }
         pendingTranscriptionDir(context).deleteRecursively()
         if (!claimed.exists() || claimed.length() == 0L) return false
-        transcribe(context, claimed)
+        // A deliberately picked file is transcribed as-is (no silence gate — see issue #93).
+        transcribe(context, claimed, gate = false)
         return true
     }
 
@@ -607,7 +609,7 @@ object DictateController {
      * Shared transcription path for both recorded and picked audio: resolves provider/key/model,
      * uploads [audioFile], commits the result and deletes the file afterwards.
      */
-    private fun transcribe(context: Context, audioFile: File, recordedSeconds: Long = 0L) {
+    private fun transcribe(context: Context, audioFile: File, recordedSeconds: Long = 0L, gate: Boolean = true) {
         val account = transcriptionAccount()
         val apiKey = account.apiKey
         if (apiKey.isBlank() && requiresKey(account)) {
@@ -646,6 +648,19 @@ object DictateController {
         transcribeJob = scope.launch {
             var keepAudio = false
             try {
+                // Silence gate (issue #93): before spending an upload, run a local Silero VAD; if the
+                // recording contains no speech, skip transcription so silent clips can't produce "ghost
+                // text" hallucinations. Fails open (treats as speech) if the check can't run. Not applied
+                // to picked files or resends of already-captured audio (see callers).
+                if (gate && prefs.dictate.skipSilentRecordings.get() &&
+                    !SpeechGate.hasSpeech(appContext, audioFile)
+                ) {
+                    _state.value = UiState.Error(
+                        message = appContext.getString(R.string.dictate__no_speech_detected),
+                        action = ErrorAction.NONE,
+                    )
+                    return@launch // audio is dropped by the finally block
+                }
                 // Single-call multimodal (issue #130): one chat/completions+input_audio request transcribes
                 // and formats together (cloud chat models only, never the on-device engine).
                 val chatAudio = account.transcriptionViaChat &&
@@ -843,7 +858,8 @@ object DictateController {
         }
         if (r.reason == RetainReason.INTERRUPTED) scope.launch { clearInterruptedAudioPref() }
         livePromptArmed = r.wasLive
-        transcribe(context, r.file, r.seconds)
+        // A user-initiated resend of already-captured audio is sent as-is (no silence gate — issue #93).
+        transcribe(context, r.file, r.seconds, gate = false)
     }
 
     /**

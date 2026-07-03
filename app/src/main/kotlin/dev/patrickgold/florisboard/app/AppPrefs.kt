@@ -346,6 +346,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__keep_screen_awake",
             default = true,
         )
+        // Skip transcription when a local Silero VAD finds no speech in the recording, so silent clips
+        // don't produce "ghost text" hallucinations or waste API credits (issue #93). Default on.
+        val skipSilentRecordings = boolean(
+            key = "dictate__skip_silent_recordings",
+            default = true,
+        )
         // Start recording immediately whenever the keyboard opens on a text field (default off).
         val instantRecording = boolean(
             key = "dictate__instant_recording",
