@@ -95,10 +95,11 @@ private class OpenAiRealtimeSession(
     }
 
     fun connect() {
+        // GA interface (the OpenAI-Beta: realtime=v1 header would force the retired beta shape →
+        // "beta_api_shape_disabled"). Session type ("transcription") distinguishes the session in GA.
         val request = Request.Builder()
             .url(URL)
             .header("Authorization", "Bearer $apiKey")
-            .header("OpenAI-Beta", "realtime=v1")
             .build()
         ws = client.newWebSocket(request, listener)
     }
@@ -127,7 +128,11 @@ private class OpenAiRealtimeSession(
             }
         }
 
-        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = emitError(t)
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            // Concise error only (no transcript/body content): the engine falls back to batch on error.
+            android.util.Log.w("DictateRT", "realtime WS failed (http=${response?.code}): ${t.message}")
+            emitError(t)
+        }
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = finishClosed(webSocket)
     }
 
