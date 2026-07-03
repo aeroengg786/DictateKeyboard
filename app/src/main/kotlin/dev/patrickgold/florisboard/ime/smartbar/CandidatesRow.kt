@@ -69,6 +69,9 @@ fun CandidatesRow(modifier: Modifier = Modifier) {
 
     val displayMode by prefs.suggestion.displayMode.collectAsState()
     val candidates by nlpManager.activeCandidatesFlow.collectAsState()
+    // Read once per composition instead of a synchronous pref get() per candidate on every keystroke
+    // (the candidates row recomposes on each character — issue: typing jank).
+    val longPressDelay by prefs.keyboard.longPressDelay.collectAsState()
 
     SnyggRow(
         elementName = FlorisImeUi.SmartbarCandidatesRow.elementName,
@@ -129,7 +132,7 @@ fun CandidatesRow(modifier: Modifier = Modifier) {
                             false
                         }
                     },
-                    longPressDelay = prefs.keyboard.longPressDelay.get().toLong(),
+                    longPressDelay = longPressDelay.toLong(),
                 )
             }
         }
@@ -152,7 +155,11 @@ private fun CandidateItem(
     } else {
         FlorisImeUi.SmartbarCandidateWord
     }.elementName
-    val attributes = mapOf("auto-commit" to if (candidate.isEligibleForAutoCommit) 1 else 0)
+    // Remembered so recomposing the row on each keystroke doesn't allocate a fresh map (which, as an
+    // unstable arg to the Snygg composables below, would also defeat their skipping) — reduces the
+    // per-keystroke recomposition + GC churn behind the typing jank.
+    val autoCommit = candidate.isEligibleForAutoCommit
+    val attributes = remember(autoCommit) { mapOf("auto-commit" to if (autoCommit) 1 else 0) }
     val selector = if (isPressed) SnyggSelector.PRESSED else SnyggSelector.NONE
 
     SnyggRow(

@@ -54,6 +54,18 @@ class DictateAccessibilityService : AccessibilityService() {
     private var isForeground = false
     private val mainHandler = Handler(Looper.getMainLooper())
 
+    // Coalesce focus re-checks. Selection-changed (and any residual) events can arrive on every
+    // keystroke, but the expensive part of updateEditableFocus() — fetching the focused node's full
+    // AccessibilityNodeInfo over IPC — only needs to run once a burst settles: the editable-focus state
+    // does not change while typing in the same field. Debouncing here removes the per-keystroke IPC
+    // flood that caused typing jank (issue #88 fallout).
+    private val focusUpdateRunnable = Runnable { updateEditableFocus() }
+
+    private fun scheduleFocusUpdate() {
+        mainHandler.removeCallbacks(focusUpdateRunnable)
+        mainHandler.postDelayed(focusUpdateRunnable, FOCUS_UPDATE_DEBOUNCE_MS)
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
@@ -69,6 +81,7 @@ class DictateAccessibilityService : AccessibilityService() {
     }
 
     override fun onDestroy() {
+        mainHandler.removeCallbacks(focusUpdateRunnable)
         clearInstance()
         super.onDestroy()
     }
@@ -79,13 +92,16 @@ class DictateAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         when (event?.eventType) {
+            // Note: TYPE_WINDOW_CONTENT_CHANGED is intentionally absent (and not subscribed in the
+            // service config): it fires on every keystroke and made updateEditableFocus() re-fetch the
+            // whole focused AccessibilityNodeInfo per character — a per-keystroke IPC flood that caused
+            // typing jank. Focus/editability only change on the events below, so we lose nothing.
             AccessibilityEvent.TYPE_VIEW_FOCUSED,
             AccessibilityEvent.TYPE_VIEW_CLICKED,
             AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED,
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
-            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
             AccessibilityEvent.TYPE_WINDOWS_CHANGED,
-            -> updateEditableFocus()
+            -> scheduleFocusUpdate()
         }
     }
 
@@ -486,6 +502,8 @@ class DictateAccessibilityService : AccessibilityService() {
         private const val NOTIF_CHANNEL = "dictate_overlay_recording"
         private const val CLIPBOARD_RESTORE_DELAY_MS = 400L
         private const val MAX_EDITABLE_SEARCH_DEPTH = 6
+        // Debounce window for focus re-checks so a typing burst triggers at most one focused-node fetch.
+        private const val FOCUS_UPDATE_DEBOUNCE_MS = 150L
 
         @Volatile
         private var instance: DictateAccessibilityService? = null

@@ -325,9 +325,15 @@ class NlpManager(context: Context) {
         }*/
         val isSelection = editorInstance.activeContent.selection.isSelectionMode
         val isExpanded = list1.isNullOrEmpty() && list2.isNullOrEmpty() || isSelection
-        scope.launch {
-            prefs.smartbar.sharedActionsExpandWithAnimation.set(false)
-            prefs.smartbar.sharedActionsExpanded.set(isExpanded)
+        // Only write when the expanded state actually changes. This runs on every keystroke (via
+        // assembleCandidates); the state usually stays the same while typing a word, so the guard avoids
+        // two redundant pref writes per character that would otherwise bounce the Smartbar flows into a
+        // recomposition (and schedule a datastore persist) each time — a contributor to the typing jank.
+        if (prefs.smartbar.sharedActionsExpanded.get() != isExpanded) {
+            scope.launch {
+                prefs.smartbar.sharedActionsExpandWithAnimation.set(false)
+                prefs.smartbar.sharedActionsExpanded.set(isExpanded)
+            }
         }
     }
 
