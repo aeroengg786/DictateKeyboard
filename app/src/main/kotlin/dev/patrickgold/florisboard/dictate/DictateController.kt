@@ -222,6 +222,7 @@ object DictateController {
     private var realtimeClosed: CompletableDeferred<Unit>? = null
     private var realtimeContext: Context? = null     // app context to edit the field's provisional text
     private val realtimeShown = StringBuilder()       // text currently committed to the field this session
+    @Volatile private var realtimeCancelled = false   // block late stream callbacks from re-adding text
 
     private var recorder: RecordingController? = null
     private var startJob: Job? = null
@@ -446,7 +447,9 @@ object DictateController {
         startJob = null
         recorder?.cancel()
         recorder = null
-        // Tear down any realtime stream (#128) and remove the live provisional text from the field.
+        // Tear down any realtime stream (#128) and remove the live provisional text from the field. Set the
+        // cancelled flag first so any stream callback still queued on the main thread can't re-add the text.
+        realtimeCancelled = true
         realtimeSession?.cancel()
         realtimeSession = null
         realtimeClosed = null
@@ -872,6 +875,7 @@ object DictateController {
         val language = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT }
         realtimeFinal.setLength(0)
         realtimeFailed = false
+        realtimeCancelled = false
         _interimText.value = ""
         realtimeContext = appContext
         realtimeShown.setLength(0)
@@ -879,6 +883,7 @@ object DictateController {
         realtimeClosed = closed
         // Type the growing transcript live into the field, applying only the minimal diff each time (#128).
         fun showLive(full: String) {
+            if (realtimeCancelled) return   // a late callback must not re-add text after a cancel
             _interimText.value = full
             runCatching { sink(appContext).setDictationPreview(full, realtimeShown.toString()) }
             realtimeShown.setLength(0)
@@ -1212,6 +1217,7 @@ object DictateController {
         recorder = null
         _livePromptActive.value = false
         // Realtime (#128): drop the stream; the WAV is stashed below and recoverable via batch as usual.
+        realtimeCancelled = true
         realtimeSession?.cancel()
         realtimeSession = null
         realtimeClosed = null
