@@ -1244,7 +1244,7 @@
     <string name="dictate__skip_silent_title">Sessiz kayıtları atla</string>
     <string name="dictate__skip_silent_summary">Sessiz seste uydurma metni ve gereksiz API çağrılarını önler</string>
     <string name="dictate__realtime_title">Gerçek zamanlı transkripsiyon</string>
-    <string name="dictate__realtime_summary">Bunu destekleyen sağlayıcılarda (OpenAI, Soniox, Deepgram, …) konuşurken metni canlı gösterir; diğerleri toplu kalır</string>
+    <string name="dictate__realtime_summary">Bunu destekleyen sağlayıcılarda konuşurken metni canlı gösterir</string>
     <string name="dictate__providers_field_realtime_model">Gerçek zamanlı model</string>
     <string name="dictate__providers_realtime_model_default">Varsayılan</string>
     <string name="dictate__instant_recording_title">Anında kayıt</string>

@@ -1264,7 +1264,7 @@
     <string name="dictate__skip_silent_title">Néma felvételek kihagyása</string>
     <string name="dictate__skip_silent_summary">Kerüli a kitalált szöveget és a felesleges API-hívásokat néma hangnál</string>
     <string name="dictate__realtime_title">Valós idejű átírás</string>
-    <string name="dictate__realtime_summary">Élőben mutatja a szöveget beszéd közben az ezt támogató szolgáltatóknál (OpenAI, Soniox, Deepgram, …); a többi kötegelt marad</string>
+    <string name="dictate__realtime_summary">Élőben mutatja a szöveget beszéd közben az ezt támogató szolgáltatóknál</string>
     <string name="dictate__providers_field_realtime_model">Valós idejű modell</string>
     <string name="dictate__providers_realtime_model_default">Alapértelmezett</string>
     <string name="dictate__instant_recording_title">Azonnali felvétel</string>
