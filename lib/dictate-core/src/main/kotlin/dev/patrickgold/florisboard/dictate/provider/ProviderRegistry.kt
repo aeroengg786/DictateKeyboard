@@ -41,6 +41,16 @@ data class ProviderPreset(
     /** Wire format of this provider's speech-to-text endpoint (OpenRouter differs – see [TranscriptionApi]). */
     val transcriptionApi: TranscriptionApi = TranscriptionApi.OPENAI_MULTIPART,
     /**
+     * Real-time streaming transcription (issue #128). [supportsRealtime] gates whether the global
+     * real-time mode applies to this provider; [realtimeApi] picks the WebSocket wire format;
+     * [defaultRealtimeModel] is the streaming model used unless the user chooses another from
+     * [curatedRealtimeModels]. Left off for batch-only providers (Groq, OpenRouter, …).
+     */
+    val supportsRealtime: Boolean = false,
+    val realtimeApi: RealtimeApi? = null,
+    val defaultRealtimeModel: String? = null,
+    val curatedRealtimeModels: List<String> = emptyList(),
+    /**
      * True for a built-in provider whose base URL is user-editable (issue #136): the editor shows a base
      * URL field pre-filled with [baseUrl], so e.g. Ollama can point at a LAN server instead of localhost.
      * Distinct from [isCustom] (a fully user-defined endpoint with its own name).
@@ -71,6 +81,14 @@ object ProviderRegistry {
         ),
         curatedTranscriptionModels = listOf(
             "gpt-4o-mini-transcribe", "gpt-4o-transcribe", "whisper-1",
+        ),
+        // Realtime (#128): wss /v1/realtime?intent=transcription. gpt-realtime-whisper is the natively
+        // streaming model (emits deltas); the -transcribe models are more accurate but final-only.
+        supportsRealtime = true,
+        realtimeApi = RealtimeApi.OPENAI,
+        defaultRealtimeModel = "gpt-realtime-whisper",
+        curatedRealtimeModels = listOf(
+            "gpt-realtime-whisper", "gpt-4o-transcribe", "gpt-4o-mini-transcribe",
         ),
     )
 
@@ -140,6 +158,15 @@ object ProviderRegistry {
         curatedTranscriptionModels = listOf(
             "gemini-2.5-flash", "gemini-3.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro",
         ),
+        // Realtime (#128): Live API (BidiGenerateContent) with input_audio_transcription. Live models are
+        // a distinct family — the exact id is verified when the Gemini Live session is built (later phase).
+        // Realtime disabled: the Live API connects but never acks `setup` (no setupComplete) with our
+        // config — the bidirectional Live protocol needs verified model id + setup shape (#128). Keep the
+        // wiring so it can be re-enabled once confirmed; until then Gemini uses batch transcription.
+        supportsRealtime = false,
+        realtimeApi = RealtimeApi.GEMINI,
+        defaultRealtimeModel = "gemini-live-2.5-flash-preview",
+        curatedRealtimeModels = listOf("gemini-live-2.5-flash-preview"),
     )
 
     val TOGETHER = ProviderPreset(
@@ -170,6 +197,13 @@ object ProviderRegistry {
         apiKeyUrl = "https://console.mistral.ai/api-keys",
         defaultTranscriptionModel = "voxtral-mini-latest",
         curatedTranscriptionModels = listOf("voxtral-mini-latest"),
+        // Realtime (#128): Voxtral realtime (/v1/realtime, vLLM-style). Model id verified when built.
+        // Realtime disabled: Mistral's raw WS returns 403 and the protocol is SDK-only/unverified (#128).
+        // Keep the wiring (RealtimeApi + session) so it can be re-enabled once the protocol is confirmed.
+        supportsRealtime = false,
+        realtimeApi = RealtimeApi.MISTRAL_VOXTRAL,
+        defaultRealtimeModel = "voxtral-mini-transcribe-realtime-2602",
+        curatedRealtimeModels = listOf("voxtral-mini-transcribe-realtime-2602"),
     )
 
     val SONIOX = ProviderPreset(
@@ -186,6 +220,11 @@ object ProviderRegistry {
         defaultTranscriptionModel = "stt-async-v5",
         // Verified against Soniox's model catalog; the live picker adds any newer async models.
         curatedTranscriptionModels = listOf("stt-async-v5"),
+        // Realtime (#128): wss stt-rt.soniox.com/transcribe-websocket, model stt-rt-v5.
+        supportsRealtime = true,
+        realtimeApi = RealtimeApi.SONIOX,
+        defaultRealtimeModel = "stt-rt-v5",
+        curatedRealtimeModels = listOf("stt-rt-v5"),
     )
 
     /**
@@ -204,6 +243,11 @@ object ProviderRegistry {
         apiKeyUrl = "https://elevenlabs.io/app/settings/api-keys",
         defaultTranscriptionModel = "scribe_v2",
         curatedTranscriptionModels = listOf("scribe_v2"),
+        // Realtime (#128): Scribe v2 Realtime WebSocket (~150ms). Model id verified when the session is built.
+        supportsRealtime = true,
+        realtimeApi = RealtimeApi.ELEVENLABS,
+        defaultRealtimeModel = "scribe_v2_realtime",
+        curatedRealtimeModels = listOf("scribe_v2_realtime"),
     )
 
     /**
@@ -221,6 +265,11 @@ object ProviderRegistry {
         apiKeyUrl = "https://console.deepgram.com/",
         defaultTranscriptionModel = "nova-3",
         curatedTranscriptionModels = listOf("nova-3", "nova-2"),
+        // Realtime (#128): wss /v1/listen?encoding=linear16&sample_rate=16000&interim_results=true.
+        supportsRealtime = true,
+        realtimeApi = RealtimeApi.DEEPGRAM,
+        defaultRealtimeModel = "nova-3",
+        curatedRealtimeModels = listOf("nova-3", "nova-2"),
     )
 
     /**
@@ -237,6 +286,12 @@ object ProviderRegistry {
         apiKeyUrl = "https://www.assemblyai.com/app/api-keys",
         defaultTranscriptionModel = "universal-3-pro",
         curatedTranscriptionModels = listOf("universal-3-pro", "universal-2"),
+        // Realtime (#128): Universal-Streaming wss streaming.assemblyai.com/v3/ws (~300ms). Model ids
+        // verified when the session is built (billed by connection-open duration).
+        supportsRealtime = true,
+        realtimeApi = RealtimeApi.ASSEMBLYAI,
+        defaultRealtimeModel = "universal-streaming",
+        curatedRealtimeModels = listOf("universal-streaming"),
     )
 
     val XAI = ProviderPreset(

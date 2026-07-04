@@ -48,6 +48,20 @@ interface DictationSink {
      * Returns true when the field accepted the removal.
      */
     fun deleteLastText(text: String): Boolean
+
+    /**
+     * Live real-time dictation preview (issue #128): reflect [newText] (the growing transcript) in the
+     * field, applying only the minimal diff from the [prevText] already shown — so streaming words appear
+     * in place, committed to the field. The overlay path has no cheap in-place update, so it skips the
+     * preview and shows nothing until [commitDictationFinal].
+     */
+    fun setDictationPreview(newText: String, prevText: String)
+
+    /** Finalize: replace the [prevText] preview with the finished/reworded [finalText] (minimal diff). */
+    fun commitDictationFinal(finalText: String, prevText: String)
+
+    /** Remove the [prevText] preview entirely (a realtime recording was cancelled / fell back to batch). */
+    fun clearDictationPreview(prevText: String)
 }
 
 /**
@@ -86,6 +100,42 @@ class ImeDictationSink(context: Context) : DictationSink {
         // Reuse the keyboard's own delete handling (one backspace per character).
         repeat(text.length) { keyboardManager.inputEventDispatcher.sendDownUp(TextKeyData.DELETE) }
         return true
+    }
+
+    override fun setDictationPreview(newText: String, prevText: String) = applyDictationDiff(prevText, newText)
+
+    override fun commitDictationFinal(finalText: String, prevText: String) {
+        // Atomic swap of the streamed preview for the finished/reworded text (keeps the common prefix,
+        // replaces only the divergent tail in one batch → no character-by-character flicker).
+        if (prevText == finalText) return
+        val cp = prevText.commonPrefixWith(finalText).length
+        editorInstance.replaceDictationTail(prevText.length - cp, finalText.substring(cp))
+    }
+
+    override fun clearDictationPreview(prevText: String) {
+        // Atomic delete of the whole streamed preview in one batch. Doing this per-character (backspaces)
+        // ANRs and can kill the keyboard when a long dictation is cancelled mid-recording.
+        if (prevText.isNotEmpty()) editorInstance.replaceDictationTail(prevText.length, "")
+    }
+
+    /**
+     * Turns the currently-shown dictation text [old] into [new] with the minimal edit: keep the common
+     * prefix, delete the divergent tail (right before the cursor) and commit the new tail. Uses the
+     * editor's own commit/delete so it stays consistent with the content model (no composing-region
+     * collision). Append-only streaming (the common case) never deletes.
+     */
+    private fun applyDictationDiff(old: String, new: String) {
+        if (old == new) return
+        val cp = old.commonPrefixWith(new).length
+        val deleteLen = old.length - cp
+        if (deleteLen == 0) {
+            // Pure append (the common streaming case): editor-consistent raw commit (no phantom/auto space
+            // so the field stays byte-identical to what we tracked), no composing-region collision.
+            editorInstance.commitTextRaw(new.substring(cp))
+        } else {
+            // A revision (provider rewrote the tail): replace it in one atomic batch, never per-character.
+            editorInstance.replaceDictationTail(deleteLen, new.substring(cp))
+        }
     }
 
     private companion object {

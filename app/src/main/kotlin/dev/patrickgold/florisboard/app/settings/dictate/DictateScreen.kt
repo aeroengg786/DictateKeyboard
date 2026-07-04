@@ -218,11 +218,11 @@ fun DictateScreen() = FlorisScreen {
                     null
                 },
             )
-            Preference(
-                icon = Icons.Default.Watch,
-                title = stringRes(R.string.dictate__wear_title),
-                summary = stringRes(R.string.dictate__wear_summary),
-                onClick = { navController.navigate(Routes.Settings.DictateWear) },
+            SwitchPreference(
+                prefs.dictate.realtimeTranscription,
+                icon = Icons.Default.GraphicEq,
+                title = stringRes(R.string.dictate__realtime_title),
+                summary = stringRes(R.string.dictate__realtime_summary),
             )
             SwitchPreference(
                 prefs.dictate.audioFocus,
@@ -307,6 +307,12 @@ fun DictateScreen() = FlorisScreen {
                     },
                 )
             }
+            Preference(
+                icon = Icons.Default.Watch,
+                title = stringRes(R.string.dictate__wear_title),
+                summary = stringRes(R.string.dictate__wear_summary),
+                onClick = { navController.navigate(Routes.Settings.DictateWear) },
+            )
         }
 
         PreferenceGroup(title = stringRes(R.string.dictate__output_group)) {

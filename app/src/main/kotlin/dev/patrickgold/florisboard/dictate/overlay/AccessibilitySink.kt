@@ -37,4 +37,19 @@ class AccessibilitySink : DictationSink {
 
     override fun deleteLastText(text: String): Boolean =
         DictateAccessibilityService.deleteLastText(text)
+
+    // Real-time overlay preview (#128): the service tracks what it injected and applies a throttled minimal
+    // diff (so live streaming into another app doesn't flood the accessibility channel). It keeps its own
+    // shown-text state, so the sink's prevText is unused here.
+    override fun setDictationPreview(newText: String, prevText: String) {
+        DictateAccessibilityService.setPreview(newText)
+    }
+
+    override fun commitDictationFinal(finalText: String, prevText: String) {
+        DictateAccessibilityService.commitPreviewFinal(finalText)
+    }
+
+    override fun clearDictationPreview(prevText: String) {
+        DictateAccessibilityService.clearPreview()
+    }
 }

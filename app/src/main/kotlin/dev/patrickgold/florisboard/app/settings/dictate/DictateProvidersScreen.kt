@@ -434,7 +434,11 @@ private fun providerSummary(
         }
     }
     val caps = buildList {
-        if (preset.capabilities.transcription) add(stringRes(R.string.dictate__providers_cap_stt))
+        if (preset.capabilities.transcription) {
+            // Note streaming support (issue #128) right on the transcription capability.
+            val stt = stringRes(R.string.dictate__providers_cap_stt)
+            add(if (preset.supportsRealtime) "$stt (+ Realtime)" else stt)
+        }
         if (preset.capabilities.chat) add(stringRes(R.string.dictate__providers_cap_chat))
     }.joinToString(", ")
     val keyState = if (account?.hasKey == true) keySet else noKey
@@ -582,6 +586,8 @@ private fun ProviderEditorDialog(
                         ?: stringRes(R.string.dictate__model_placeholder),
                     onBrowse = { pickerKind = ModelKind.TRANSCRIPTION },
                 )
+                // Real-time streaming model (issue #128) is intentionally not exposed: every provider has
+                // effectively one usable streaming model, so the engine always uses the preset default.
             }
             // Rewording model is unused while single-call multimodal is on (one model does both, #130).
             if (showChat && !transcriptionViaChat) {
