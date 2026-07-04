@@ -44,6 +44,7 @@ import dev.patrickgold.florisboard.ime.core.DisplayLanguageNamesIn
 import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.keyboard.LayoutType
 import dev.patrickgold.florisboard.ime.nlp.latin.GlideDictionaryCatalog
+import dev.patrickgold.florisboard.ime.nlp.latin.BigramCatalog
 import dev.patrickgold.florisboard.ime.nlp.latin.GlideDictionaryManager
 import dev.patrickgold.florisboard.ime.nlp.latin.LatinLanguageProvider
 import dev.patrickgold.florisboard.keyboardManager
@@ -157,7 +158,18 @@ fun LocalizationScreen() = FlorisScreen {
                         else ->
                             "\n✕ " + stringRes(R.string.settings__localization__subtype_glide_unavailable)
                     }
-                    val summary = baseSummary + glideSuffix
+                    // Autocorrect context data (bigrams, Tier 2): downloaded/deleted with the language, so
+                    // show whether it's present too — otherwise the user can't tell it arrived.
+                    val contextSuffix = when {
+                        glideLang in BigramCatalog.BUNDLED ||
+                            GlideDictionaryManager.bigramInstalled(context, glideLang) ->
+                            "\n✓ " + stringRes(R.string.settings__localization__subtype_context_ready)
+                        BigramCatalog.forLang(glideLang) != null ->
+                            "\n⤓ " + stringRes(R.string.settings__localization__subtype_context_available)
+                        else ->
+                            "\n✕ " + stringRes(R.string.settings__localization__subtype_context_unavailable)
+                    }
+                    val summary = baseSummary + glideSuffix + contextSuffix
                     Preference(
                         title = when (displayLanguageNamesIn) {
                             DisplayLanguageNamesIn.SYSTEM_LOCALE -> subtype.primaryLocale.displayName()
