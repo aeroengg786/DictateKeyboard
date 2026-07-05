@@ -1387,6 +1387,8 @@
 
     <string name="dictate__wear_title" comment="Title of the Wear OS companion settings screen">Wear OS</string>
     <string name="dictate__wear_summary" comment="Summary of the Wear OS settings entry on the main Dictate screen">Options for dictating from a paired watch</string>
+    <string name="dictate__wear_install_title" comment="Title of the button that opens the Play Store to install the Wear OS app">Install Dictate on your watch</string>
+    <string name="dictate__wear_install_summary" comment="Summary explaining the install button opens the Play Store listing where a paired watch can be chosen">Opens the Play Store. On a paired watch (Wear OS 3 or newer), pick your watch as the install target.</string>
     <string name="dictate__wear_auto_rewording_title" comment="Title of the toggle that auto-rewords watch dictations">Auto-reword watch dictations</string>
     <string name="dictate__wear_auto_rewording_summary" comment="Short summary for the auto-rewording-on-watch toggle">Reword dictations made from the watch, like on the phone.</string>
     <string name="dictate__wear_standalone_title" comment="Title of the toggle that lets a paired Wear OS watch transcribe on its own">Sync key to watch</string>
