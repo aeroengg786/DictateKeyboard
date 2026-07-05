@@ -15,6 +15,7 @@ import com.k2fsa.sherpa.onnx.FeatureConfig
 import com.k2fsa.sherpa.onnx.OfflineModelConfig
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
+import com.k2fsa.sherpa.onnx.OfflineTransducerModelConfig
 import com.k2fsa.sherpa.onnx.OfflineWhisperModelConfig
 import com.k2fsa.sherpa.onnx.SileroVadModelConfig
 import com.k2fsa.sherpa.onnx.Vad
@@ -72,7 +73,7 @@ class LocalTranscriptionProvider(
             val language = request.language?.substringBefore('-')?.takeIf { it.isNotBlank() }.orEmpty()
 
             val text = try {
-                val recognizer = RecognizerCache.acquire(encoder, decoder, tokens, numThreads, language)
+                val recognizer = RecognizerCache.acquire(modelDir, numThreads, language)
                 val vadFile = File(modelDir, VAD)
                 // Whisper handles ~30 s per pass; segment longer audio at speech pauses (VAD) so the
                 // tail isn't dropped. Short clips take the simple single-pass path (no VAD overhead).
@@ -187,6 +188,12 @@ class LocalTranscriptionProvider(
         const val DECODER = "decoder.onnx"
         const val TOKENS = "tokens.txt"
 
+        /**
+         * Optional joiner for transducer models (e.g. NeMo Parakeet, issue #154). Its presence in a model
+         * directory is what makes [RecognizerCache] build a transducer recognizer instead of a Whisper one.
+         */
+        const val JOINER = "joiner.onnx"
+
         /** Optional Silero VAD model, downloaded alongside each model; enables long-audio segmenting. */
         const val VAD = "vad.onnx"
 
@@ -214,17 +221,35 @@ private object RecognizerCache {
     private var recognizer: OfflineRecognizer? = null
 
     @Synchronized
-    fun acquire(encoder: File, decoder: File, tokens: File, numThreads: Int, language: String): OfflineRecognizer {
-        // Language is baked into the Whisper config at build time, so it is part of the cache key:
-        // switching the input language rebuilds the recognizer (rare; recognizer load is ~1s).
-        val cacheKey = (encoder.parentFile?.absolutePath ?: encoder.absolutePath) + "|" + language
+    fun acquire(modelDir: File, numThreads: Int, language: String): OfflineRecognizer {
+        val encoder = File(modelDir, LocalTranscriptionProvider.ENCODER)
+        val decoder = File(modelDir, LocalTranscriptionProvider.DECODER)
+        val tokens = File(modelDir, LocalTranscriptionProvider.TOKENS)
+        val joiner = File(modelDir, LocalTranscriptionProvider.JOINER)
+        val isTransducer = joiner.exists()
+
+        // Language is baked into the Whisper config at build time, so it is part of the cache key
+        // (switching the input language rebuilds the recognizer; ~1s). A transducer decodes the audio
+        // as-is and ignores the language, so it stays out of the key for those.
+        val cacheKey = modelDir.absolutePath + "|" + (if (isTransducer) "" else language)
         val existing = recognizer
         if (existing != null && cacheKey == key) return existing
 
         existing?.release()
-        val config = OfflineRecognizerConfig(
-            featConfig = FeatureConfig(sampleRate = AudioDecode.TARGET_SAMPLE_RATE, featureDim = 80),
-            modelConfig = OfflineModelConfig(
+        val modelConfig = if (isTransducer) {
+            // NeMo Parakeet TDT (issue #154): encoder/decoder/joiner transducer, model-type per sherpa-onnx.
+            OfflineModelConfig(
+                transducer = OfflineTransducerModelConfig(
+                    encoder = encoder.absolutePath,
+                    decoder = decoder.absolutePath,
+                    joiner = joiner.absolutePath,
+                ),
+                tokens = tokens.absolutePath,
+                numThreads = numThreads,
+                modelType = "nemo_transducer",
+            )
+        } else {
+            OfflineModelConfig(
                 whisper = OfflineWhisperModelConfig(
                     encoder = encoder.absolutePath,
                     decoder = decoder.absolutePath,
@@ -235,7 +260,11 @@ private object RecognizerCache {
                 tokens = tokens.absolutePath,
                 numThreads = numThreads,
                 modelType = "whisper",
-            ),
+            )
+        }
+        val config = OfflineRecognizerConfig(
+            featConfig = FeatureConfig(sampleRate = AudioDecode.TARGET_SAMPLE_RATE, featureDim = 80),
+            modelConfig = modelConfig,
         )
         // assetManager defaults to null → the model is read from the absolute file paths above.
         return OfflineRecognizer(config = config).also {

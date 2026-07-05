@@ -138,10 +138,30 @@ object LocalModelCatalog {
         ),
     )
 
-    /** All catalog models in display order: multilingual (tiny→small), then the English-only variants. */
+    /**
+     * ~670 MB. NVIDIA Parakeet TDT 0.6B v3 (issue #154) — a NeMo *transducer* (encoder/decoder/joiner),
+     * not Whisper. Covers 25 European languages; typically faster and more accurate than the small
+     * Whisper variants. Exported to ONNX (int8) by the sherpa-onnx project. Licensing: the Parakeet
+     * weights are CC-BY-4.0 (NVIDIA); sherpa-onnx export is Apache-2.0 — both allow redistribution.
+     */
+    val PARAKEET_TDT_V3 = LocalModelSpec(
+        id = "parakeet-tdt-0.6b-v3",
+        displayName = "Parakeet TDT 0.6B v3",
+        description = "25 European languages · fast, accurate · ~670 MB (experimental)",
+        files = listOf(
+            LocalModelFile("$REL/parakeet-tdt-0.6b-v3-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 652_184_281, "acfc2b4456377e15d04f0243af540b7fe7c992f8d898d751cf134c3a55fd2247"),
+            LocalModelFile("$REL/parakeet-tdt-0.6b-v3-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 11_845_275, "179e50c43d1a9de79c8a24149a2f9bac6eb5981823f2a2ed88d655b24248db4e"),
+            LocalModelFile("$REL/parakeet-tdt-0.6b-v3-joiner.int8.onnx", LocalTranscriptionProvider.JOINER, 6_355_277, "3164c13fc2821009440d20fcb5fdc78bff28b4db2f8d0f0b329101719c0948b3"),
+            LocalModelFile("$REL/parakeet-tdt-0.6b-v3-tokens.txt", LocalTranscriptionProvider.TOKENS, 93_939, "d58544679ea4bc6ac563d1f545eb7d474bd6cfa467f0a6e2c1dc1c7d37e3c35d"),
+            VAD_FILE,
+        ),
+    )
+
+    /** All catalog models in display order: multilingual (tiny→small), the English variants, Parakeet. */
     val all: List<LocalModelSpec> = listOf(
         WHISPER_TINY, WHISPER_BASE, WHISPER_SMALL,
         WHISPER_TINY_EN, WHISPER_BASE_EN, WHISPER_SMALL_EN,
+        PARAKEET_TDT_V3,
     )
 
     fun byId(id: String): LocalModelSpec? = all.firstOrNull { it.id == id }
