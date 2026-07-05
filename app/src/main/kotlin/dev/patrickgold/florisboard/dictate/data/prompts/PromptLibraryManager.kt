@@ -71,8 +71,7 @@ object PromptLibraryManager {
      */
     suspend fun bundled(context: Context): List<PromptLibraryEntry>? = withContext(Dispatchers.IO) {
         runCatching {
-            context.applicationContext.assets.open("prompt-library.json").use { it.readBytes() }
-                .toString(Charsets.UTF_8)
+            readBundledBody(context)
         }.mapCatching { parse(it) }.getOrNull()
     }
 
@@ -118,8 +117,7 @@ object PromptLibraryManager {
         } else null
         if (cached != null) return Result(cached, fromCache = true, error = error)
         val bundled = runCatching {
-            context.applicationContext.assets.open("prompt-library.json").use { it.readBytes() }
-                .toString(Charsets.UTF_8).let { parse(it) }
+            parse(readBundledBody(context))
         }.getOrNull()
         return if (bundled != null) {
             Result(bundled, fromCache = true, error = error)
@@ -127,6 +125,11 @@ object PromptLibraryManager {
             Result(emptyList(), fromCache = false, error = error)
         }
     }
+
+    private fun readBundledBody(context: Context): String =
+        context.applicationContext.assets.open("prompt-library.json")
+            .bufferedReader(Charsets.UTF_8)
+            .use { it.readText() }
 
     private fun parse(body: String): List<PromptLibraryEntry> {
         val doc = json.decodeFromString<PromptLibraryDocument>(body)
