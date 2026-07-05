@@ -57,10 +57,11 @@ class RecordingController(private val context: Context) {
      * [audioSource] defaults to the local mic; pass [MediaRecorder.AudioSource.VOICE_COMMUNICATION]
      * when recording is routed through a Bluetooth SCO headset.
      *
-     * [pcmSink], if given, receives every captured mono 16-bit LE PCM frame (a fresh array of exactly the
-     * read length) as it arrives — used to stream audio to a realtime transcription session (issue #128)
-     * while the WAV is still written in parallel (so the batch path / fallback / resend flows are intact).
-     * Called on the capture thread; keep it non-blocking (hand the bytes to a queue/socket and return).
+     * [pcmSink], if given, receives every captured mono 16-bit LE PCM frame as it arrives — used to stream
+     * audio to a realtime transcription session (issue #128) while the WAV is still written in parallel
+     * (so the batch path / fallback / resend flows are intact). The buffer is reused after the callback
+     * returns, so consumers must synchronously copy/encode/queue the first [len] bytes if they need to keep
+     * them. Called on the capture thread; keep it non-blocking (hand the bytes to a queue/socket and return).
      */
     @SuppressLint("MissingPermission") // caller holds RECORD_AUDIO; an init failure is handled below.
     fun start(
@@ -103,8 +104,7 @@ class RecordingController(private val context: Context) {
                     runCatching { out.write(buf, 0, n) }
                     pcmBytes += n
                     updatePeak(buf, n)
-                    // Copy before handing off — buf is reused on the next read. Only when streaming.
-                    if (pcmSink != null) runCatching { pcmSink(buf.copyOf(n), n) }
+                    if (pcmSink != null) runCatching { pcmSink(buf, n) }
                 }
             }
         }.also { it.start() }
