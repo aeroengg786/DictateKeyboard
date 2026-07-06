@@ -179,8 +179,7 @@ private class OpenAiRealtimeSession(
 
     override fun sendAudio(pcm16: ByteArray, len: Int) {
         val socket = ws ?: return
-        val bytes = if (len == pcm16.size) pcm16 else pcm16.copyOf(len)
-        val b64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+        val b64 = Base64.encodeToString(pcm16, 0, len, Base64.NO_WRAP)
         val msg = buildJsonObject {
             put("type", "input_audio_buffer.append")
             put("audio", b64)
@@ -443,10 +442,9 @@ private class ElevenLabsRealtimeSession(
     }
 
     override fun sendAudio(pcm16: ByteArray, len: Int) {
-        val bytes = if (len == pcm16.size) pcm16 else pcm16.copyOf(len)
         val msg = buildJsonObject {
             put("message_type", "input_audio_chunk")
-            put("audio_base_64", Base64.encodeToString(bytes, Base64.NO_WRAP))
+            put("audio_base_64", Base64.encodeToString(pcm16, 0, len, Base64.NO_WRAP))
             put("commit", false)
             put("sample_rate", 16_000)
         }.toString()
@@ -554,11 +552,10 @@ private class GeminiRealtimeSession(
 
     override fun sendAudio(pcm16: ByteArray, len: Int) {
         if (!started) return   // wait for setupComplete before streaming audio (Gemini Live requirement)
-        val bytes = if (len == pcm16.size) pcm16 else pcm16.copyOf(len)
         val msg = buildJsonObject {
             putJsonObject("realtimeInput") {
                 putJsonObject("audio") {
-                    put("data", Base64.encodeToString(bytes, Base64.NO_WRAP))
+                    put("data", Base64.encodeToString(pcm16, 0, len, Base64.NO_WRAP))
                     put("mimeType", "audio/pcm;rate=16000")
                 }
             }
