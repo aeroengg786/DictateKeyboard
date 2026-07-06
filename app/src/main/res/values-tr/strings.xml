@@ -1528,4 +1528,5 @@
     <string name="dictate__legacy_layout_locked_label">Yalnızca klasik düzen</string>
     <string name="dictate__legacy_layout_swipe_label">Klasik düzen, klavye için kaydır</string>
     <string name="dictate__legacy_select_all">Tümünü seç</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — yeniden denemek için dokun</string>
 </resources>

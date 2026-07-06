@@ -1548,4 +1548,5 @@
     <string name="dictate__legacy_layout_locked_label">Csak klasszikus elrendezés</string>
     <string name="dictate__legacy_layout_swipe_label">Klasszikus elrendezés, húzás a billentyűzethez</string>
     <string name="dictate__legacy_select_all">Összes kijelölése</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — koppints az újrapróbáláshoz</string>
 </resources>

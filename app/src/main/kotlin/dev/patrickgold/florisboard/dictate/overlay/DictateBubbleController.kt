@@ -821,10 +821,22 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     private fun onTap() {
         if (prefs.dictate.floatingButtonHaptic.get()) vibrateTap()
+        val current = DictateController.state.value
+        // Recovery (#160): if the previous floating-button dictation failed but its recording was kept
+        // (e.g. a flaky signal dropped the upload), a tap re-sends that audio instead of starting a new
+        // recording — so the dictation isn't lost just because the bubble has no resend chip of its own.
+        if (current is DictateController.UiState.Error &&
+            current.action == DictateController.ErrorAction.RESEND
+        ) {
+            service.startMicForeground()
+            weStartedDictation = true
+            DictateController.sendRetainedAudio(context)
+            return
+        }
         // Promote the service to a microphone foreground service *before* recording starts, so the mic
         // capture is allowed while the app is in the background (Android 14+). Demoted again when the
         // dictation finishes (see manageForeground).
-        val starting = DictateController.state.value is DictateController.UiState.Idle
+        val starting = current is DictateController.UiState.Idle
         if (starting) {
             service.startMicForeground()
             weStartedDictation = true
@@ -851,7 +863,13 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         when (state) {
             is DictateController.UiState.Error -> if (weStartedDictation) {
                 weStartedDictation = false
-                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                // When the recording was kept (#160), tell the user a tap re-sends it.
+                val msg = if (state.action == DictateController.ErrorAction.RESEND) {
+                    context.getString(R.string.dictate__floating_button_retry_hint, state.message)
+                } else {
+                    state.message
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 holdVisual(ERROR_HOLD_MS, FlashKind.ERROR)
             }
             is DictateController.UiState.Idle -> {

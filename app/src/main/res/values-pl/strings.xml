@@ -1566,4 +1566,5 @@
     <string name="dictate__legacy_layout_locked_label">Tylko klasyczny układ</string>
     <string name="dictate__legacy_layout_swipe_label">Klasyczny układ, przesuń, by wyświetlić klawiaturę</string>
     <string name="dictate__legacy_select_all">Zaznacz wszystko</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — dotknij, aby ponowić</string>
 </resources>

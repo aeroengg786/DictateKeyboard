@@ -1550,4 +1550,5 @@
     <string name="dictate__legacy_layout_locked_label">Само класическа подредба</string>
     <string name="dictate__legacy_layout_swipe_label">Класическа подредба, плъзнете за клавиатура</string>
     <string name="dictate__legacy_select_all">Избери всичко</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — докоснете за нов опит</string>
 </resources>

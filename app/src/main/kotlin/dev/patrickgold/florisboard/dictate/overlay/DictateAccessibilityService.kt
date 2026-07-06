@@ -204,50 +204,46 @@ class DictateAccessibilityService : AccessibilityService() {
      * the field accepted the change — some custom/legacy views do not support `ACTION_SET_TEXT`.
      */
     private fun commitTextIntoFocused(text: String): Boolean {
-        // Resolve the target field freshly. The accessibility input focus (and its input connection) can
-        // go stale when the host app recreates its field — e.g. WhatsApp clearing the composer on send —
-        // and a stale binding silently swallows the commit, so the green check showed but no text appeared
-        // (#132 follow-up). We therefore trust the input-connection path only while the focused node is
-        // still a *live* node; otherwise we re-locate the field from the currently visible window and write
-        // straight into that, so the text always lands in the field the user actually sees, even after the
-        // service has been running a long time.
-        val focused = focusedEditableNode()
-        val focusLive = focused != null && runCatching { focused.refresh() }.getOrDefault(false)
+        if (text.isEmpty()) return true // silence: nothing to insert — a no-op is a success, not a failure.
 
-        // 1. Live focus → the accessibility input connection (cleanest: WebView-safe, no clipboard toast).
-        if (focusLive && commitViaInputConnection(text)) {
-            flogDebug { "commit via inputConnection (live focus) len=${text.length}" }
-            return true
-        }
-
-        // 2. Node-based write into the actual on-screen field. Prefer the live focused node; if it was
-        //    stale or missing, take the editable field from the currently active window (the real one).
-        val target = (if (focusLive) focused else null) ?: activeWindowEditable()
-        if (target != null) {
-            runCatching { target.refresh() }
-            // Some fields — notably Jetpack Compose text fields (e.g. Gemini's prompt box, #156) — only
-            // accept ACTION_SET_TEXT while they actually hold input focus. If the target isn't focused
-            // (the host app defocused it after send / while recording), request focus first.
-            if (!target.isFocused) {
+        // Insert exactly like a normal keyboard: through the accessibility input connection's commitText,
+        // straight into the field at the cursor — no clipboard, no toast, and it never prepends a shown
+        // placeholder (e.g. WhatsApp's "Message"). The stability trick is to first resolve the field the
+        // user actually SEES (fresh from the live window, so a recreated/stale field can't swallow the
+        // text) and, if it isn't already focused, give it input focus. Focusing the visible field points
+        // the input connection at THAT field instead of an editor the app discarded — the root of the old
+        // "green check, no text" flakiness. A short retry covers the instant right after a send when the
+        // host app is still rebuilding its field. Node ACTION_SET_TEXT / clipboard paste stay only as
+        // fallbacks for the rare fields that accept no input connection (old OS, some WebView/custom views).
+        repeat(COMMIT_ATTEMPTS) { attempt ->
+            val target = activeWindowEditable()
+            if (target != null && !target.isFocused) {
                 runCatching { target.performAction(AccessibilityNodeInfo.ACTION_FOCUS) }
                 runCatching { target.refresh() }
+                // Let the input connection rebind to the field we just focused before we commit into it.
+                SystemClock.sleep(FOCUS_SETTLE_MS)
             }
-            if (setTextOnFocused(target, text)) {
+
+            // 1. The keyboard-style path: commit through the input connection (no clipboard, no toast).
+            if (commitViaInputConnection(text)) {
+                flogDebug { "commit via inputConnection len=${text.length}" }
+                return true
+            }
+            // 2. Fallback: write straight into the visible node (older OS without the a11y input method, or
+            //    fields that expose no editor connection). Placeholder-safe via editableText().
+            if (target != null && setTextOnFocused(target, text)) {
                 flogDebug { "commit via setText len=${text.length}" }
                 return true
             }
-            if (pasteIntoFocused(target, text)) {
+            // 3. Last resort only: clipboard paste (WebView/custom inputs that ignore both). The paste
+            //    toast is therefore the rare exception, never the normal case.
+            if (target != null && pasteIntoFocused(target, text)) {
                 flogDebug { "commit via paste len=${text.length}" }
                 return true
             }
+            if (attempt < COMMIT_ATTEMPTS - 1) SystemClock.sleep(COMMIT_RETRY_DELAY_MS)
         }
-
-        // 3. Last resort: the input connection even when no live focused node was found — covers apps that
-        //    expose an editor connection without an accessible focused node.
-        if (!focusLive && commitViaInputConnection(text)) {
-            flogDebug { "commit via inputConnection (fallback) len=${text.length}" }
-            return true
-        }
+        flogDebug { "commit FAILED after $COMMIT_ATTEMPTS attempts len=${text.length}" }
         return false
     }
 
@@ -546,6 +542,11 @@ class DictateAccessibilityService : AccessibilityService() {
         private const val NOTIF_CHANNEL = "dictate_overlay_recording"
         private const val CLIPBOARD_RESTORE_DELAY_MS = 400L
         private const val MAX_EDITABLE_SEARCH_DEPTH = 6
+        // Floating-button commit reliability (#161): resolve + focus the field the user sees so the input
+        // connection binds to it, retry briefly while the host app rebuilds its field right after a send.
+        private const val COMMIT_ATTEMPTS = 2
+        private const val COMMIT_RETRY_DELAY_MS = 60L
+        private const val FOCUS_SETTLE_MS = 40L
         // Debounce window for focus re-checks so a typing burst triggers at most one focused-node fetch.
         private const val FOCUS_UPDATE_DEBOUNCE_MS = 150L
         // Real-time overlay preview (#128): min gap between accessibility writes while streaming, so live

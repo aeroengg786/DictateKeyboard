@@ -1532,4 +1532,5 @@
     <string name="dictate__legacy_layout_locked_label">Solo diseño clásico</string>
     <string name="dictate__legacy_layout_swipe_label">Diseño clásico, desliza para el teclado</string>
     <string name="dictate__legacy_select_all">Seleccionar todo</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — toca para reintentar</string>
 </resources>

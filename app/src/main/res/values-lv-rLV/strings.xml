@@ -1494,4 +1494,5 @@
     <string name="dictate__legacy_layout_locked_label">Tikai klasiskais izkārtojums</string>
     <string name="dictate__legacy_layout_swipe_label">Klasiskais izkārtojums, velciet, lai atvērtu tastatūru</string>
     <string name="dictate__legacy_select_all">Atlasīt visu</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — pieskaries, lai mēģinātu vēlreiz</string>
 </resources>

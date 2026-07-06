@@ -1272,6 +1272,7 @@
     <string name="dictate__floating_button_undo_summary_off" comment="Summary when the floating undo button is disabled">No undo button shown.</string>
     <string name="dictate__floating_button_undo_failed" comment="Toast when the undo button could not remove the last text (field changed)">Couldn\'t undo — the text may have changed.</string>
     <string name="dictate__floating_button_no_prompts" comment="Toast when long-pressing the floating button but no rewording prompts exist">No rewording prompts yet — add some in Dictate settings.</string>
+    <string name="dictate__floating_button_retry_hint" comment="Toast after a failed floating-button dictation whose recording was kept; %1$s is the error message. Tapping the button re-sends the recording.">%1$s — tap to retry</string>
     <string name="dictate__floating_button_badge_new" comment="Small 'New' badge on the floating-button settings entry. Keep very short.">New</string>
 
     <!-- Dictate input panel (IME) -->

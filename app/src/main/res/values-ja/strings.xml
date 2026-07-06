@@ -1480,4 +1480,5 @@
     <string name="dictate__legacy_layout_locked_label">クラシックレイアウトのみ</string>
     <string name="dictate__legacy_layout_swipe_label">クラシックレイアウト、スワイプでキーボード</string>
     <string name="dictate__legacy_select_all">すべて選択</string>
+    <string name="dictate__floating_button_retry_hint">%1$s — タップで再試行</string>
 </resources>
