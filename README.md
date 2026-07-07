@@ -17,10 +17,16 @@ A powerful Whisper AI keyboard for dictation, real-time transcription and typing
 </p>
 
 <p>
-  <a href="https://play.google.com/store/apps/details?id=net.devemperor.dictate"><img alt="Get it on Google Play" width="300px" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/></a>
-  &nbsp;&nbsp;
-  <a href="https://paypal.me/DevEmperor"><img alt="Donate with PayPal" width="200px" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_150x38.png"/></a>
+  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-7F52FF?logo=kotlin&logoColor=white">
+  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white">
 </p>
+
+<table align="center">
+  <tr>
+    <td valign="middle"><a href="https://play.google.com/store/apps/details?id=net.devemperor.dictate"><img alt="Get it on Google Play" width="300" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/></a></td>
+    <td valign="middle"><a href="https://paypal.me/DevEmperor"><img alt="Donate with PayPal" width="200" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_150x38.png"/></a></td>
+  </tr>
+</table>
 
 </div>
 
@@ -33,15 +39,23 @@ A powerful Whisper AI keyboard for dictation, real-time transcription and typing
 
 ---
 
-## 📸 Screenshots &amp; demo
+## 🎬 See it in action
 
-<p align="center">
-  <img src="img/dictate_demo.gif" alt="Dictate in action — dictating into an app" width="300">
-</p>
+<table>
+  <tr>
+    <td width="330" align="center">
+      <img src="img/dictate_demo.gif" alt="Dictate in action" width="300">
+    </td>
+    <td valign="middle">
+      <h3>Speak, and it's typed.</h3>
+      Tap the mic, talk naturally, and watch clean, punctuated text land in <b>any</b> app —
+      in real time. Prefer keys? Glide-type with word suggestions and autocorrect. Need it
+      more formal, translated or summarised? Hand it to an AI rewording prompt.
+    </td>
+  </tr>
+</table>
 
-<p align="center">
-  <img src="img/presentation_graphic_en-EN.png" alt="Dictate Keyboard" width="720">
-</p>
+## 📸 Screenshots
 
 <table>
   <tr>
@@ -123,13 +137,6 @@ another keyboard is open.
 
 ## 🧱 Built on FlorisBoard
 
-<p align="center">
-  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-7F52FF?logo=kotlin&logoColor=white">
-  <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white">
-  <img alt="FlorisBoard" src="https://img.shields.io/badge/base-FlorisBoard-30B7E6">
-  <img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-30B7E6">
-</p>
-
 Dictate Keyboard is a fork of [**FlorisBoard**](https://github.com/florisboard/florisboard),
 an open-source, privacy-respecting keyboard created by
 [Patrick Goldinger](https://github.com/patrickgold) and
@@ -157,14 +164,6 @@ Dictate Keyboard is released under the terms of the
 - See [`LICENSE`](LICENSE) for the full license text and [`NOTICE`](NOTICE) for required
   attribution notices.
 - Speech recognition is powered by [OpenAI Whisper](https://openai.com/index/whisper/).
-
-## ⭐ Star history
-
-<p align="center">
-  <a href="https://star-history.com/#DevEmperor/DictateKeyboard&Date">
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DevEmperor/DictateKeyboard&type=Date" width="600">
-  </a>
-</p>
 
 ## ❤️ Support
 
