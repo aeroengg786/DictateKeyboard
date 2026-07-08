@@ -87,8 +87,8 @@
     <string name="quick_action__dictate_live_prompt__tooltip">Record a spoken instruction and send it to the AI</string>
     <string name="quick_action__dictate_prompts" comment="Please mind the limited available space for the quick action strings">AI prompts</string>
     <string name="quick_action__dictate_prompts__tooltip">Open the AI rewording prompts</string>
-    <string name="quick_action__dictate_reinsert" comment="Please mind the limited available space for the quick action strings">Re-insert</string>
-    <string name="quick_action__dictate_reinsert__tooltip">Insert your last dictation again</string>
+    <string name="quick_action__dictate_reinsert" comment="Please mind the limited available space for the quick action strings. Opens the dictation history panel">History</string>
+    <string name="quick_action__dictate_reinsert__tooltip">Open your dictation history</string>
     <string name="quick_action__language_switch" comment="Please mind the limited available space for the quick action strings">Switch language</string>
     <string name="quick_action__language_switch__tooltip">Perform language switch</string>
     <string name="quick_action__system_prev_input_method" comment="Quick action: switch back to the previously used keyboard/IME. Mind the limited space.">Switch keyboard</string>
@@ -1609,6 +1609,31 @@
     <string name="dictate__reasoning_effort_high_summary" comment="Summary for high reasoning effort">Most thinking, slower</string>
     <string name="dictate__stats_title" comment="Title of the dictation statistics screen">Statistics</string>
     <string name="dictate__stats_menu_summary" comment="Summary for the statistics entry in Dictate settings">Words, time saved, streak and more</string>
+    <!-- Transcription history / activity log (issue #140) -->
+    <string name="dictate__history_title" comment="Title of the transcription history screen and in-keyboard panel">History</string>
+    <string name="dictate__history_menu_summary" comment="Summary for the history entry in Dictate settings">Replay, re-insert and manage past dictations</string>
+    <string name="dictate__history_empty" comment="Shown when no dictations have been recorded yet">No dictations yet — your recent dictations will appear here.</string>
+    <string name="dictate__history_enable_title" comment="Toggle: capture finished dictations into the history">Keep a history</string>
+    <string name="dictate__history_enable_summary" comment="Short summary for the keep-a-history toggle">Log dictations to re-insert or review later.</string>
+    <string name="dictate__history_audio_title" comment="Toggle: also keep the source audio of each dictation">Keep audio</string>
+    <string name="dictate__history_audio_summary" comment="Short summary for the keep-audio toggle">Replay and re-transcribe (~1.9 MB/min).</string>
+    <string name="dictate__history_retention_title" comment="Row + dialog title for the history storage limits">Storage limits</string>
+    <string name="dictate__history_max_entries_title" comment="Retention setting: how many entries to keep">Maximum entries</string>
+    <string name="dictate__history_max_age_title" comment="Retention setting: auto-delete entries older than N days">Auto-delete after</string>
+    <string name="dictate__history_audio_budget_title" comment="Retention setting: total storage budget for retained audio">Audio storage limit</string>
+    <string name="dictate__history_age_days" comment="Retention value. {days} is a number of days">{days} days</string>
+    <string name="dictate__history_age_never" comment="Retention value: keep entries forever">No limit</string>
+    <string name="dictate__history_failed" comment="Placeholder text for a logged dictation whose transcription failed; its audio can be re-transcribed">Transcription failed — re-transcribe to retry</string>
+    <string name="dictate__history_search" comment="Placeholder in the history search field">Search history</string>
+    <string name="dictate__history_disk_usage" comment="Disk-usage line on the history screen. {size} is a file size like 12.3 MB">Retained audio: {size}</string>
+    <string name="dictate__history_audio_missing" comment="Shown when a stored recording can no longer be played back">Recording is no longer available.</string>
+    <string name="dictate__history_copied" comment="Toast confirmation after copying a transcript">Copied to clipboard</string>
+    <string name="dictate__history_play" comment="Accessibility description for the play/stop recording button">Play recording</string>
+    <string name="dictate__history_copy" comment="Accessibility description for the copy transcript button">Copy transcript</string>
+    <string name="dictate__history_delete" comment="Accessibility description for the delete entry button">Delete entry</string>
+    <string name="dictate__history_clear_title" comment="Title of the clear-history confirmation dialog">Clear history?</string>
+    <string name="dictate__history_clear_message" comment="Body of the clear-history confirmation dialog">This permanently deletes all history entries and any retained audio.</string>
+    <string name="dictate__history_clear_confirm" comment="Confirm button that clears the whole history">Clear all</string>
     <string name="dictate__stats_empty" comment="Shown on the statistics screen before any dictation exists">No dictations yet — your stats will appear here once you start dictating.</string>
     <string name="dictate__stats_time_saved" comment="Label of the hero time-saved statistic">Time saved</string>
     <string name="dictate__stats_time_saved_sub" comment="Subtitle under the time-saved figure">vs. typing on a keyboard</string>

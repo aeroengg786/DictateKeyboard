@@ -503,6 +503,37 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__interrupted_audio_live",
             default = false,
         )
+        // --- Transcription history / activity log (issue #140) -----------------------------------
+        // Keep a rolling, browsable log of finished dictations (transcript + metadata) so they can be
+        // re-inserted, re-transcribed or reviewed later. Supersedes the single lastDictation slot for the
+        // history UI; when off, nothing is logged. Never captured in incognito/password fields.
+        val historyEnabled = boolean(
+            key = "dictate__history_enabled",
+            default = true,
+        )
+        // Additionally keep the source audio (WAV) of each logged dictation so a flaky transcription can be
+        // replayed and re-transcribed. Off by default (privacy + disk: ~1.9 MB per recorded minute); the
+        // audio lives in the app's private storage and is pruned by the byte budget below.
+        val historyAudioRetention = boolean(
+            key = "dictate__history_audio_retention",
+            default = false,
+        )
+        // Cap: how many entries to keep (oldest dropped first).
+        val historyMaxEntries = int(
+            key = "dictate__history_max_entries",
+            default = 50,
+        )
+        // Cap: entries older than this many days are dropped (0 = no age limit).
+        val historyMaxAgeDays = int(
+            key = "dictate__history_max_age_days",
+            default = 30,
+        )
+        // Cap: total megabytes of retained audio; once exceeded, the oldest recordings' audio is dropped
+        // (their transcript text is kept).
+        val historyAudioBudgetMb = int(
+            key = "dictate__history_audio_budget_mb",
+            default = 200,
+        )
         // --- Lifetime dictation statistics (issue #142) ------------------------------------------
         // Never auto-reset (unlike totalAudioSeconds below, which the rate nudge clears); only the user
         // can reset them from the stats screen. Updated centrally after each successful dictation.

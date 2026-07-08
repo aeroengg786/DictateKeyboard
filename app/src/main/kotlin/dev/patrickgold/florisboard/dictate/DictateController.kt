@@ -38,6 +38,9 @@ import dev.patrickgold.florisboard.dictate.audio.SpeechGate
 import dev.patrickgold.florisboard.dictate.data.prompts.DictatePromptDefaults
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptModel
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
+import dev.patrickgold.florisboard.dictate.data.history.DictateHistoryEntry
+import dev.patrickgold.florisboard.dictate.data.history.DictateHistorySource
+import dev.patrickgold.florisboard.dictate.data.history.DictateHistoryStore
 import dev.patrickgold.florisboard.dictate.data.stats.DictateStats
 import dev.patrickgold.florisboard.dictate.provider.ChatRequest
 import dev.patrickgold.florisboard.dictate.provider.DictateApiException
@@ -54,6 +57,8 @@ import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionRequest
 import dev.patrickgold.florisboard.dictate.overlay.AccessibilitySink
+import dev.patrickgold.florisboard.ime.text.key.KeyVariation
+import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.util.AppVersionUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -301,6 +306,24 @@ object DictateController {
 
     /** The currently kept audio (failed or interrupted), or null when there is nothing to re-send. */
     private var retained: RetainedAudio? = null
+
+    /**
+     * Metadata threaded from a transcription into [finalizeAndCommit] so the finished dictation can be
+     * logged to the history store (issue #140). [audioFile] is the (still-present) recorded WAV to retain
+     * when audio retention is on. [isReplay] marks a re-transcription of already-counted audio so stats
+     * aren't double-counted, and [replayHistoryId] (when set) updates that existing entry's text in place
+     * instead of inserting a new row.
+     */
+    private data class HistoryCapture(
+        val audioFile: File?,
+        val providerId: String,
+        val providerName: String,
+        val model: String,
+        val language: String,
+        val source: String,
+        val isReplay: Boolean = false,
+        val replayHistoryId: Long? = null,
+    )
 
     /**
      * A previously captured audio segment to prepend to the next finished recording, set when the user
@@ -716,7 +739,7 @@ object DictateController {
         pendingTranscriptionDir(context).deleteRecursively()
         if (!claimed.exists() || claimed.length() == 0L) return false
         // A deliberately picked file is transcribed as-is (no silence gate — see issue #93).
-        transcribe(context, claimed, gate = false)
+        transcribe(context, claimed, gate = false, source = DictateHistorySource.IMPORT)
         return true
     }
 
@@ -724,38 +747,65 @@ object DictateController {
      * Shared transcription path for both recorded and picked audio: resolves provider/key/model,
      * uploads [audioFile], commits the result and deletes the file afterwards.
      */
-    private fun transcribe(context: Context, audioFile: File, recordedSeconds: Long = 0L, gate: Boolean = true) {
+    private fun transcribe(
+        context: Context,
+        audioFile: File,
+        recordedSeconds: Long = 0L,
+        gate: Boolean = true,
+        // History (issue #140): [isReplay] re-transcribes already-counted audio (skip stats),
+        // [replayHistoryId] updates that stored entry's text in place, [source] tags the origin.
+        isReplay: Boolean = false,
+        source: String = DictateHistorySource.KEYBOARD,
+        replayHistoryId: Long? = null,
+    ) {
         val account = transcriptionAccount()
         val apiKey = account.apiKey
+        val preset = presetFor(account)
+        val model = account.transcriptionModel.takeIf { it.isNotBlank() }
+            ?: preset.defaultTranscriptionModel
+            ?: "gpt-4o-mini-transcribe"
+        val appContext = context.applicationContext
+        // History metadata (issue #140), resolved once so the success (capture) and EVERY failure path —
+        // including the early returns below (no key / model not downloaded) — log the same info.
+        val historyProviderName = account.displayName.ifBlank { preset.displayName }
+        val historyLanguage = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT } ?: ""
+        val historySource = if (outputTarget == OutputTarget.OVERLAY) DictateHistorySource.OVERLAY else source
+        // Logs the failed dictation with its audio (safety net, issue #140) unless this is a replay, then
+        // drops the cache file. Async so the early-return callers don't block.
+        fun logFailureAndDrop() {
+            if (replayHistoryId != null) {
+                audioFile.delete()
+                return
+            }
+            scope.launch {
+                recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource)
+                if (audioFile.exists()) audioFile.delete()
+            }
+        }
+
         if (apiKey.isBlank() && requiresKey(account)) {
             _state.value = UiState.Error(
                 message = context.getString(R.string.dictate__error_no_api_key),
                 kind = DictateApiException.Kind.INVALID_API_KEY,
                 action = ErrorAction.OPEN_SETTINGS,
             )
-            audioFile.delete()
+            logFailureAndDrop()
             return
         }
 
-        val preset = presetFor(account)
-        val model = account.transcriptionModel.takeIf { it.isNotBlank() }
-            ?: preset.defaultTranscriptionModel
-            ?: "gpt-4o-mini-transcribe"
-
         // On-device (#104): guide the user to download a model instead of failing mid-transcription.
         if (preset.transcriptionApi == TranscriptionApi.LOCAL_ONDEVICE &&
-            !LocalModelManager.isInstalled(context.applicationContext, model)
+            !LocalModelManager.isInstalled(appContext, model)
         ) {
             _state.value = UiState.Error(
                 message = context.getString(R.string.dictate__local_model_not_installed_error),
                 kind = DictateApiException.Kind.UNKNOWN,
                 action = ErrorAction.OPEN_SETTINGS,
             )
-            audioFile.delete()
+            logFailureAndDrop()
             return
         }
 
-        val appContext = context.applicationContext
         ensureHapticObserver(appContext)
         _state.value = UiState.Transcribing()
         // Live prompt is consumed by this transcription only (the next recording is normal again).
@@ -821,7 +871,17 @@ object DictateController {
                 }
                 // Shared finalize: rewording/formatting + mappings + commit + stats. Reused by the
                 // realtime path (issue #128), which supplies its own already-streamed transcript.
-                finalizeAndCommit(appContext, result.text, recordedSeconds, live, alreadyFormatted = chatAudio)
+                val capture = HistoryCapture(
+                    audioFile = audioFile,
+                    providerId = account.providerId,
+                    providerName = historyProviderName,
+                    model = model,
+                    language = historyLanguage,
+                    source = historySource,
+                    isReplay = isReplay,
+                    replayHistoryId = replayHistoryId,
+                )
+                finalizeAndCommit(appContext, result.text, recordedSeconds, live, alreadyFormatted = chatAudio, capture = capture)
             } catch (c: CancellationException) {
                 // User aborted via the stop button: discard quietly (state set by cancelTranscription),
                 // never show an error. The audio is dropped in the finally block.
@@ -831,10 +891,18 @@ object DictateController {
                 // Exportable failures (too large / bad format) keep the audio regardless of the resend
                 // pref, so it can be saved instead of lost (issue #144).
                 keepAudio = retainFailedAudio(audioFile, live, recordedSeconds, force = e.kind in EXPORTABLE_ERROR_KINDS)
+                // Safety net (issue #140): log the failed dictation with its audio so it can be recovered
+                // later; not for replays (the entry already exists).
+                if (replayHistoryId == null) {
+                    recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource)
+                }
                 _state.value = apiError(e, appContext, canResend = keepAudio)
             } catch (t: Throwable) {
                 _pendingPrompts.value = emptyList()
                 keepAudio = retainFailedAudio(audioFile, live, recordedSeconds)
+                if (replayHistoryId == null) {
+                    recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource)
+                }
                 _state.value = UiState.Error(
                     message = appContext.getString(R.string.dictate__error_unknown),
                     kind = DictateApiException.Kind.UNKNOWN,
@@ -860,6 +928,7 @@ object DictateController {
         live: Boolean,
         alreadyFormatted: Boolean,
         finalizeViaComposing: Boolean = false,
+        capture: HistoryCapture? = null,
     ) {
         val finalText = if (live) {
             // The spoken transcript is an instruction; send it to GPT (optionally operating on the current
@@ -891,20 +960,26 @@ object DictateController {
             // user can recover it via Reinsert, and surface an error instead of "success".
             if (!committed && outputTarget == OutputTarget.OVERLAY && outputText.isNotEmpty()) {
                 rememberLastDictation(outputText)
-                DictateStats.recordDictation(prefs, outputText, recordedSeconds)
+                if (capture?.isReplay != true) {
+                    DictateStats.recordDictation(prefs, outputText, recordedSeconds)
+                    if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
+                }
+                recordHistory(appContext, outputText, recordedSeconds, capture, reworded = live)
                 discardRetainedAudio()
-                if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
                 _state.value = UiState.Error(
                     message = appContext.getString(R.string.dictate__error_overlay_insert_failed),
                 )
                 return
             }
         }
-        // Re-insert safety net (issue #111) + lifetime stats (issue #142).
+        // Re-insert safety net (issue #111) + lifetime stats (issue #142) + history log (issue #140).
         rememberLastDictation(outputText)
-        DictateStats.recordDictation(prefs, outputText, recordedSeconds)
+        if (capture?.isReplay != true) {
+            DictateStats.recordDictation(prefs, outputText, recordedSeconds)
+            if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
+        }
+        recordHistory(appContext, outputText, recordedSeconds, capture, reworded = live)
         discardRetainedAudio()
-        if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
         _state.value = UiState.Idle
         if (outputTarget != OutputTarget.IME || !showMilestoneNudge(appContext)) {
             maybePromptForReview()
@@ -1036,8 +1111,22 @@ object DictateController {
                     }
                     return@launch
                 }
+                // History (issue #140): capture the metadata + WAV before deleting the cache file, so
+                // audio retention (if on) can copy it in during finalize; then drop the cache original.
+                val rtAccount = transcriptionAccount()
+                val rtPreset = presetFor(rtAccount)
+                val rtModel = rtAccount.realtimeModel.takeIf { it.isNotBlank() }
+                    ?: rtPreset.defaultRealtimeModel ?: ""
+                val rtCapture = HistoryCapture(
+                    audioFile = wavFile?.takeIf { it.exists() && it.length() > 0L },
+                    providerId = rtAccount.providerId,
+                    providerName = rtAccount.displayName.ifBlank { rtPreset.displayName },
+                    model = rtModel,
+                    language = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT } ?: "",
+                    source = DictateHistorySource.REALTIME,
+                )
+                finalizeAndCommit(appContext, transcript, recordedSeconds, live, alreadyFormatted = false, finalizeViaComposing = true, capture = rtCapture)
                 wavFile?.delete()
-                finalizeAndCommit(appContext, transcript, recordedSeconds, live, alreadyFormatted = false, finalizeViaComposing = true)
             } catch (c: CancellationException) {
                 throw c
             } catch (t: Throwable) {
@@ -1398,6 +1487,9 @@ object DictateController {
     fun hasLastDictation(): Boolean =
         prefs.dictate.rememberLastDictation.get() && prefs.dictate.lastDictation.get().isNotEmpty()
 
+    /** Whether the history feature is enabled — gates the history Smartbar button's enabled state (#140). */
+    fun isHistoryEnabled(): Boolean = prefs.dictate.historyEnabled.get()
+
     /**
      * Re-inserts the last successful dictation into the focused field (issue #111). The cached text is
      * committed verbatim (no auto-formatting/auto-enter, which already ran on the original) and is kept,
@@ -1434,6 +1526,152 @@ object DictateController {
         scope.launch { prefs.dictate.lastDictation.set("") }
         clearError()
         return true
+    }
+
+    // --- Transcription history (issue #140) -----------------------------------------------------
+
+    /**
+     * Logs a finished dictation to the history store, honoring the opt-in and the privacy gate. Called
+     * from [finalizeAndCommit] with the final committed text and the threaded [capture] metadata. A replay
+     * with a known entry id overwrites that entry's text in place; otherwise a new row is inserted (and the
+     * WAV copied in when audio retention is on). No-op when history is off, the field is sensitive, or
+     * there is no capture context (e.g. a plain re-insert).
+     */
+    private suspend fun recordHistory(
+        appContext: Context,
+        text: String,
+        recordedSeconds: Long,
+        capture: HistoryCapture?,
+        reworded: Boolean,
+    ) {
+        if (capture == null || text.isBlank()) return
+        if (!prefs.dictate.historyEnabled.get()) return
+        if (isSensitiveDictationField(appContext)) return
+        capture.replayHistoryId?.let { id ->
+            DictateHistoryStore.updateText(appContext, id, text)
+            return
+        }
+        DictateHistoryStore.record(
+            context = appContext,
+            prefs = prefs,
+            text = text,
+            providerId = capture.providerId,
+            providerName = capture.providerName,
+            model = capture.model,
+            language = capture.language,
+            durationSecs = recordedSeconds,
+            source = capture.source,
+            reworded = reworded,
+            audioFile = capture.audioFile,
+        )
+    }
+
+    /**
+     * Logs a *failed* dictation to the history (issue #140 safety net) so its audio can be recovered and
+     * re-transcribed later — the resend chip is transient (it disappears; see issue #114). Only when
+     * history + audio retention are on (a failure with no kept audio is not recoverable), and never in a
+     * sensitive field. The entry carries a placeholder text and `failed=true`.
+     */
+    private suspend fun recordFailedHistory(
+        appContext: Context,
+        audioFile: File,
+        providerId: String,
+        providerName: String,
+        model: String,
+        language: String,
+        recordedSeconds: Long,
+        source: String,
+    ) {
+        // Gated only on the master history switch: a failed dictation has no text, so its audio is the ONLY
+        // recovery path — we keep it even when "keep audio" (which governs successful dictations) is off.
+        if (!prefs.dictate.historyEnabled.get()) return
+        if (isSensitiveDictationField(appContext)) return
+        if (!audioFile.exists() || audioFile.length() == 0L) return
+        DictateHistoryStore.record(
+            context = appContext,
+            prefs = prefs,
+            text = appContext.getString(R.string.dictate__history_failed),
+            providerId = providerId,
+            providerName = providerName,
+            model = model,
+            language = language,
+            durationSecs = recordedSeconds,
+            source = source,
+            reworded = false,
+            audioFile = audioFile,
+            failed = true,
+            forceAudio = true,
+        )
+    }
+
+    /** Exports a history entry's retained audio to Downloads/Dictate (issue #140), toasting the result. */
+    fun exportHistoryAudio(context: Context, entry: DictateHistoryEntry) {
+        val path = entry.audioPath ?: return
+        val src = File(path)
+        if (!src.exists() || src.length() == 0L) return
+        val appContext = context.applicationContext
+        scope.launch {
+            val savedName = withContext(Dispatchers.IO) { exportAudioToDownloads(appContext, src) }
+            val message = if (savedName != null) {
+                appContext.getString(R.string.dictate__audio_saved, savedName)
+            } else {
+                appContext.getString(R.string.dictate__audio_save_failed)
+            }
+            Toast.makeText(appContext, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * True when the active in-keyboard field is a password field or in incognito mode, so a dictation into
+     * it must not be logged. Only meaningful for the IME target — the floating button injects into
+     * arbitrary apps via accessibility with no reliable field-sensitivity signal, so it is never gated here.
+     */
+    private fun isSensitiveDictationField(context: Context): Boolean {
+        if (outputTarget != OutputTarget.IME) return false
+        return runCatching {
+            val state = context.keyboardManager().value.activeState
+            state.isIncognitoMode || state.keyVariation == KeyVariation.PASSWORD
+        }.getOrDefault(false)
+    }
+
+    /**
+     * Commits a stored history entry's text into the focused field (issue #140), verbatim like
+     * [reinsertLastDictation] — no auto-formatting/auto-enter (those already ran). Used by the in-keyboard
+     * history panel's per-row insert. No-op while a recording/transcription/rewording is in flight.
+     */
+    fun insertHistoryText(context: Context, text: String) {
+        if (_state.value is UiState.Recording || _state.value is UiState.Transcribing ||
+            _state.value is UiState.Rewording
+        ) return
+        if (text.isEmpty()) return
+        outputTarget = OutputTarget.IME
+        sink(context).commitText(text)
+        clearError()
+    }
+
+    /**
+     * Re-transcribes a stored entry's retained audio (issue #140) and commits the fresh result into the
+     * field, then overwrites the entry's text in place. The history-owned WAV is copied to a cache temp
+     * first so the shared transcribe path's finally-delete can't remove it. Marked as a replay so stats
+     * aren't double-counted. No-op when the entry has no retained audio or a dictation is in flight.
+     */
+    fun retranscribeHistoryEntry(context: Context, entry: DictateHistoryEntry) {
+        if (_state.value is UiState.Recording || _state.value is UiState.Transcribing ||
+            _state.value is UiState.Rewording
+        ) return
+        val path = entry.audioPath ?: return
+        val src = File(path)
+        if (!src.exists() || src.length() == 0L) return
+        val temp = File(context.cacheDir, "dictate_history_replay.wav")
+        runCatching { src.copyTo(temp, overwrite = true) }.getOrElse { return }
+        outputTarget = OutputTarget.IME
+        clearError()
+        // A failed entry's first successful re-transcribe SHOULD count stats (it was never counted); an
+        // already-successful entry's re-transcribe must not double-count → isReplay only when not failed.
+        transcribe(
+            context, temp, entry.durationSecs, gate = false,
+            isReplay = !entry.failed, source = entry.source, replayHistoryId = entry.id,
+        )
     }
 
     // --- Rate / Donate nudges (roadmap 9.7/9.8) -------------------------------------------------

@@ -117,6 +117,12 @@ fun DictateScreen() = FlorisScreen {
             summary = stringRes(R.string.dictate__stats_menu_summary),
             onClick = { navController.navigate(Routes.Settings.DictateStats) },
         )
+        Preference(
+            icon = Icons.Default.History,
+            title = stringRes(R.string.dictate__history_title),
+            summary = stringRes(R.string.dictate__history_menu_summary),
+            onClick = { navController.navigate(Routes.Settings.DictateHistory) },
+        )
 
         // Hub: each row opens a dedicated sub-screen (issue #153), keeping this landing page short and
         // scannable instead of one long list of every setting.

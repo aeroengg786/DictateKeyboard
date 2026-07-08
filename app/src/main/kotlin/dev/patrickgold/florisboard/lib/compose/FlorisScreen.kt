@@ -64,6 +64,9 @@ typealias FlorisScreenNavigationIcon = @Composable () -> Unit
 interface FlorisScreenScope {
     var title: String
 
+    /** Optional composable that replaces the plain [title] text in the app bar (e.g. an in-bar search field). */
+    var titleContent: (@Composable () -> Unit)?
+
     var navigationIconVisible: Boolean
 
     var previewFieldVisible: Boolean
@@ -85,6 +88,7 @@ interface FlorisScreenScope {
 
 private class FlorisScreenScopeImpl : FlorisScreenScope {
     override var title: String by mutableStateOf("")
+    override var titleContent: (@Composable () -> Unit)? by mutableStateOf(null)
     override var navigationIconVisible: Boolean by mutableStateOf(true)
     override var previewFieldVisible: Boolean by mutableStateOf(false)
     override var scrollable: Boolean by mutableStateOf(true)
@@ -146,7 +150,7 @@ private class FlorisScreenScopeImpl : FlorisScreenScope {
 
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = { FlorisAppBar(title, navigationIcon.takeIf { navigationIconVisible }, actions, scrollBehavior) },
+            topBar = { FlorisAppBar(title, navigationIcon.takeIf { navigationIconVisible }, actions, scrollBehavior, titleContent) },
             bottomBar = bottomBar,
             floatingActionButton = fab,
         ) { innerPadding ->

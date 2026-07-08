@@ -798,7 +798,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                 dev.patrickgold.florisboard.dictate.DictateController.refreshPrompts(appContext)
                 activeState.imeUiMode = ImeUiMode.DICTATE
             }
-            KeyCode.DICTATE_REINSERT -> dev.patrickgold.florisboard.dictate.DictateController.reinsertLastDictation(appContext)
+            // Repurposed for the transcription history panel (issue #140): opens the browsable list of
+            // recent dictations to quickly re-insert or re-transcribe, superseding the one-shot reinsert.
+            KeyCode.DICTATE_REINSERT -> { activeState.imeUiMode = ImeUiMode.HISTORY }
             KeyCode.KANA_SWITCHER -> handleKanaSwitch()
             KeyCode.KANA_HIRA -> handleKanaHira()
             KeyCode.KANA_KATA -> handleKanaKata()
@@ -1045,9 +1047,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                     subtypeManager.subtypes.size > 1
                 }
                 KeyCode.DICTATE_REINSERT -> {
-                    // Greyed out unless a last dictation is actually cached (and the feature is enabled),
-                    // so the button visibly reflects whether there is anything to re-insert.
-                    dev.patrickgold.florisboard.dictate.DictateController.hasLastDictation()
+                    // Opens the transcription history panel (issue #140); greyed out only when the history
+                    // feature itself is turned off, since the panel is otherwise always available.
+                    dev.patrickgold.florisboard.dictate.DictateController.isHistoryEnabled()
                 }
                 else -> true
             }

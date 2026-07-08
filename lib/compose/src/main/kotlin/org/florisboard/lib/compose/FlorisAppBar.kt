@@ -31,11 +31,13 @@ fun FlorisAppBar(
     title: String,
     navigationIcon: (@Composable () -> Unit)?,
     actions: @Composable RowScope.() -> Unit = { },
-    scrollBehavior: TopAppBarScrollBehavior
+    scrollBehavior: TopAppBarScrollBehavior,
+    // Optional composable that replaces the plain title text (e.g. an in-bar search field).
+    titleContent: (@Composable () -> Unit)? = null,
 ) {
     TopAppBar(
         navigationIcon = navigationIcon ?: {},
-        title = {
+        title = titleContent ?: {
             Text(
                 text = title,
                 overflow = TextOverflow.Ellipsis,

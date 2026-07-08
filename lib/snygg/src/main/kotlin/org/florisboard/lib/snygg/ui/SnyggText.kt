@@ -55,6 +55,10 @@ fun SnyggText(
     selector: SnyggSelector? = null,
     modifier: Modifier = Modifier,
     fontWeight: FontWeight? = null,
+    // Optional overrides for cases where the caller needs a fixed line budget (e.g. a two-line preview)
+    // instead of the themed values; null falls back to the stylesheet.
+    maxLines: Int? = null,
+    overflow: TextOverflow? = null,
     text: String,
 ) {
     ProvideSnyggStyle(elementName, attributes, selector) { style ->
@@ -77,8 +81,8 @@ fun SnyggText(
             lineHeight = style.lineHeight(),
             textAlign = style.textAlign(),
             textDecoration = style.textDecorationLine(),
-            maxLines = style.textMaxLines(),
-            overflow = style.textOverflow(),
+            maxLines = maxLines ?: style.textMaxLines(),
+            overflow = overflow ?: style.textOverflow(),
         )
     }
 }

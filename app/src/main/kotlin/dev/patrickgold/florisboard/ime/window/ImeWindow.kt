@@ -63,6 +63,7 @@ import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.devtools.DevtoolsOverlay
 import dev.patrickgold.florisboard.dictate.DictateLegacyLayout
+import dev.patrickgold.florisboard.dictate.ui.DictateHistoryLayout
 import dev.patrickgold.florisboard.dictate.ui.DictateInputLayout
 import dev.patrickgold.florisboard.dictate.ui.LegacyDictateLayout
 import dev.patrickgold.florisboard.dictate.ui.LegacyLayoutState
@@ -277,6 +278,7 @@ private fun ImeInnerWindow() {
                 ImeUiMode.MEDIA -> ProvideActualLayoutDirection { MediaInputLayout() }
                 ImeUiMode.CLIPBOARD -> ProvideActualLayoutDirection { ClipboardInputLayout() }
                 ImeUiMode.DICTATE -> ProvideActualLayoutDirection { DictateInputLayout() }
+                ImeUiMode.HISTORY -> ProvideActualLayoutDirection { DictateHistoryLayout() }
             }
             ImeSystemUiFloating()
         }

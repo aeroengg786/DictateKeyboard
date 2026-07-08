@@ -186,7 +186,7 @@ fun DictateInputLayout(
  * `MaterialTheme.colorScheme.onSurface` (MaterialTheme is not provided inside the keyboard IME, so that
  * tint renders invisible against the Snygg-themed panel).
  */
-private fun Modifier.dictatePanelScrollbar(
+internal fun Modifier.dictatePanelScrollbar(
     state: ScrollState,
     accent: Color,
     width: Dp = 5.dp,
