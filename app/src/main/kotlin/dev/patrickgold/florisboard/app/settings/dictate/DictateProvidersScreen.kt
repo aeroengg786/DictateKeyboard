@@ -33,6 +33,8 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -744,6 +746,8 @@ private fun EditorField(
     keyboardType: KeyboardType = KeyboardType.Text,
     onBrowse: (() -> Unit)? = null,
 ) {
+    // Secret fields (API keys) start masked but can be revealed with the eye toggle (issue #195).
+    var reveal by remember { mutableStateOf(false) }
     OutlinedTextField(
         modifier = Modifier.padding(top = 8.dp),
         value = value,
@@ -751,19 +755,32 @@ private fun EditorField(
         singleLine = true,
         label = { Text(label) },
         placeholder = { if (placeholder.isNotEmpty()) Text(placeholder) },
-        visualTransformation = if (isSecret) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (isSecret && !reveal) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (isSecret) KeyboardType.Password else keyboardType,
         ),
-        trailingIcon = onBrowse?.let {
-            {
-                IconButton(onClick = it) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = stringRes(R.string.dictate__model_picker_title),
-                    )
+        trailingIcon = when {
+            isSecret -> {
+                {
+                    IconButton(onClick = { reveal = !reveal }) {
+                        Icon(
+                            imageVector = if (reveal) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
+            onBrowse != null -> {
+                {
+                    IconButton(onClick = onBrowse) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringRes(R.string.dictate__model_picker_title),
+                        )
+                    }
+                }
+            }
+            else -> null
         },
     )
 }
