@@ -110,6 +110,12 @@
     <string name="settings__home__title" comment="Title of the Home screen">Bem-vindo ao {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">O {app_name} não está ativado no sistema e, portanto, não estará disponível para ser selecionado no alternador de teclado. Clique aqui para resolver este problema.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">O {app_name} não foi selecionado como o teclado padrão. Clique aqui para resolver este problema.</string>
+    <string name="settings__search__title" comment="Title of the settings search screen">Pesquisar nas configurações</string>
+    <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Pesquisar nas configurações…</string>
+    <string name="settings__search__recent" comment="Header above recently used search terms">Pesquisas recentes</string>
+    <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Limpar pesquisas recentes</string>
+    <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Populares</string>
+    <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">Nenhuma configuração encontrada</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Idiomas e Layouts</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Exibir nomes de idiomas em</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Subtipos</string>

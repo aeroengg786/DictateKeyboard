@@ -17,7 +17,9 @@
 package dev.patrickgold.florisboard.app.settings.clipboard
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
 import dev.patrickgold.florisboard.ime.clipboard.CLIPBOARD_HISTORY_NUM_GRID_COLUMNS_AUTO
 import dev.patrickgold.florisboard.ime.clipboard.ClipboardSyncBehavior
@@ -40,6 +42,7 @@ fun ClipboardScreen() = FlorisScreen {
     content {
         SwitchPreference(
             prefs.clipboard.useInternalClipboard,
+            modifier = Modifier.settingsSearchAnchor("pref__clipboard__use_internal_clipboard__label"),
             title = stringRes(R.string.pref__clipboard__use_internal_clipboard__label),
             summary = stringRes(R.string.pref__clipboard__use_internal_clipboard__summary),
         )
@@ -76,6 +79,7 @@ fun ClipboardScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.pref__clipboard__group_clipboard_history__label)) {
             SwitchPreference(
                 prefs.clipboard.historyEnabled,
+                modifier = Modifier.settingsSearchAnchor("pref__clipboard__enable_clipboard_history__label"),
                 title = stringRes(R.string.pref__clipboard__enable_clipboard_history__label),
                 summary = stringRes(R.string.pref__clipboard__enable_clipboard_history__summary),
             )
@@ -113,6 +117,7 @@ fun ClipboardScreen() = FlorisScreen {
             )
             SwitchPreference(
                 prefs.clipboard.historyAutoCleanSensitiveEnabled,
+                modifier = Modifier.settingsSearchAnchor("pref__clipboard__auto_clean_sensitive__label"),
                 title = stringRes(R.string.pref__clipboard__auto_clean_sensitive__label),
                 enabledIf = { prefs.clipboard.historyEnabled isEqualTo true },
                 visibleIf = { AndroidVersion.ATLEAST_API33_T },

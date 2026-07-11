@@ -112,6 +112,12 @@
     <string name="settings__home__title" comment="Title of the Home screen">Laipni lūgts {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} nav iespējots sistēmas iestatījumos, tādēļ tā nebūs pieejama kā ievades avots atlasītājā. Klikšķināt šeit, lai atrisinātu to.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} nav atlasīts kā noklusējuma ievades veids. Klikšķināt šeit, lai to novērstu.</string>
+    <string name="settings__search__title" comment="Title of the settings search screen">Meklēt iestatījumos</string>
+    <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Meklēt iestatījumos…</string>
+    <string name="settings__search__recent" comment="Header above recently used search terms">Nesenie meklējumi</string>
+    <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Notīrīt nesenos meklējumus</string>
+    <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Populāri</string>
+    <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">Nav atrasts neviens iestatījums</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Valodas un izkārtojumi</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Attēlot valodu nosaukumu</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Attēlot tastatūras iezīmes apakšveida valodā</string>

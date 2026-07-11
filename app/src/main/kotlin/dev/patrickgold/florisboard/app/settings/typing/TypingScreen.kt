@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
@@ -62,6 +63,7 @@ fun TypingScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.pref__suggestion__title)) {
             SwitchPreference(
                 prefs.suggestion.enabled,
+                modifier = Modifier.settingsSearchAnchor("pref__suggestion__enabled__label"),
                 title = stringRes(R.string.pref__suggestion__enabled__label),
                 summary = stringRes(R.string.pref__suggestion__enabled__summary),
             )
@@ -80,6 +82,7 @@ fun TypingScreen() = FlorisScreen {
             ListPreference(
                 prefs.suggestion.incognitoMode,
                 icon = ImageVector.vectorResource(id = R.drawable.ic_incognito),
+                modifier = Modifier.settingsSearchAnchor("pref__suggestion__incognito_mode__label"),
                 title = stringRes(R.string.pref__suggestion__incognito_mode__label),
                 entries = enumDisplayEntriesOf(IncognitoMode::class),
             )
@@ -88,6 +91,7 @@ fun TypingScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.pref__correction__title)) {
             SwitchPreference(
                 prefs.correction.autoCapitalization,
+                modifier = Modifier.settingsSearchAnchor("pref__correction__auto_capitalization__label"),
                 title = stringRes(R.string.pref__correction__auto_capitalization__label),
                 summary = stringRes(R.string.pref__correction__auto_capitalization__summary),
             )
@@ -122,6 +126,7 @@ fun TypingScreen() = FlorisScreen {
             )
             SwitchPreference(
                 prefs.correction.doubleSpacePeriod,
+                modifier = Modifier.settingsSearchAnchor("pref__correction__double_space_period__label"),
                 title = stringRes(R.string.pref__correction__double_space_period__label),
                 summary = stringRes(R.string.pref__correction__double_space_period__summary),
             )

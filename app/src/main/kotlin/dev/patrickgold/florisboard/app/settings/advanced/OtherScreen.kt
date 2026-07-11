@@ -26,12 +26,14 @@ import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.AppTheme
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
@@ -64,11 +66,13 @@ fun OtherScreen() = FlorisScreen {
         ListPreference(
             prefs.other.settingsTheme,
             icon = Icons.Default.Palette,
+            modifier = Modifier.settingsSearchAnchor("pref__other__settings_theme__label"),
             title = stringRes(R.string.pref__other__settings_theme__label),
             entries = enumDisplayEntriesOf(AppTheme::class),
         )
         ColorPickerPreference(
             pref = prefs.other.accentColor,
+            modifier = Modifier.settingsSearchAnchor("pref__other__settings_accent_color__label"),
             title = stringRes(R.string.pref__other__settings_accent_color__label),
             defaultValueLabel = stringRes(R.string.action__default),
             icon = Icons.Default.FormatColorFill,
@@ -86,6 +90,7 @@ fun OtherScreen() = FlorisScreen {
         ListPreference(
             prefs.other.settingsLanguage,
             icon = Icons.Default.Language,
+            modifier = Modifier.settingsSearchAnchor("pref__other__settings_language__label"),
             title = stringRes(R.string.pref__other__settings_language__label),
             entries = listPrefEntries {
                 listOf(

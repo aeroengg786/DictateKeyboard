@@ -1034,6 +1034,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "internal__open_floating_button_after_setup",
             default = false,
         )
+        // Newline-separated most-recent settings-search queries (newest first), for the search screen's
+        // recent-search chips (issue #187).
+        val settingsSearchHistory = string(
+            key = "internal__settings_search_history",
+            default = "",
+        )
         val versionOnInstall = string(
             key = "internal__version_on_install",
             default = VersionName.DEFAULT_RAW,

@@ -116,6 +116,12 @@
     <string name="settings__home__title" comment="Title of the Home screen">{app_name} Uygulamasına Hoş Geldiniz</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} sistemde etkin değil ve bu nedenle giriş yöntemi seçicisinde bir giriş yöntemi olarak kullanılamayacak. Bu sorunu çözmek için buraya tıklayın.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} varsayılan giriş yöntemi olarak seçilmemiş. Bu sorunu çözmek için buraya tıklayın.</string>
+    <string name="settings__search__title" comment="Title of the settings search screen">Ayarlarda ara</string>
+    <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Ayarlarda ara…</string>
+    <string name="settings__search__recent" comment="Header above recently used search terms">Son aramalar</string>
+    <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Son aramaları temizle</string>
+    <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Popüler</string>
+    <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">Ayar bulunamadı</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Diller &amp; Düzenler</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Dil adlarını şu dilde göster</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Klavye etiketlerini alt tür dilinde göster</string>

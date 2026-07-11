@@ -164,6 +164,13 @@
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when the keyboard is not enabled in the system">{app_name} is not enabled in the system and thus won\'t be available as an input method in the input picker. Click here to resolve this issue.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when the keyboard is not selected as the default keyboard">{app_name} is not selected as the default input method. Click here to resolve this issue.</string>
 
+    <string name="settings__search__title" comment="Title of the settings search screen">Search settings</string>
+    <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Search settings…</string>
+    <string name="settings__search__recent" comment="Header above recently used search terms">Recent searches</string>
+    <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Clear recent searches</string>
+    <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Popular</string>
+    <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">No settings found</string>
+
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Languages &amp; Layouts</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Display language names in</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Display keyboard labels in subtype language</string>

@@ -27,9 +27,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
@@ -66,6 +68,7 @@ fun DictateRewordingScreen() = FlorisScreen {
 
         SwitchPreference(
             prefs.dictate.rewordingEnabled,
+            modifier = Modifier.settingsSearchAnchor("dictate__rewording_enabled_title"),
             icon = Icons.Default.AutoFixHigh,
             title = stringRes(R.string.dictate__rewording_enabled_title),
             summary = stringRes(R.string.dictate__rewording_enabled_summary),
@@ -73,6 +76,7 @@ fun DictateRewordingScreen() = FlorisScreen {
 
         ListPreference(
             prefs.dictate.promptsLayout,
+            modifier = Modifier.settingsSearchAnchor("dictate__prompts_layout_title"),
             icon = Icons.Default.ViewAgenda,
             title = stringRes(R.string.dictate__prompts_layout_title),
             entries = listPrefEntries {
@@ -108,6 +112,7 @@ fun DictateRewordingScreen() = FlorisScreen {
 
         SwitchPreference(
             prefs.dictate.autoFormattingEnabled,
+            modifier = Modifier.settingsSearchAnchor("dictate__auto_formatting_title"),
             icon = Icons.Default.AutoFixHigh,
             title = stringRes(R.string.dictate__auto_formatting_title),
             summary = stringRes(R.string.dictate__auto_formatting_summary),
@@ -118,6 +123,7 @@ fun DictateRewordingScreen() = FlorisScreen {
         val reasoningCustom by prefs.dictate.rewordingReasoningEffortCustom.collectAsState()
         var reasoningDialogOpen by remember { mutableStateOf(false) }
         Preference(
+            modifier = Modifier.settingsSearchAnchor("dictate__reasoning_effort_title"),
             icon = Icons.Default.Bolt,
             title = stringRes(R.string.dictate__reasoning_effort_title),
             summary = when (reasoningEffort) {

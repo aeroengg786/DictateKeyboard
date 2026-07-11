@@ -50,6 +50,7 @@ import dev.patrickgold.florisboard.app.ext.ExtensionListScreen
 import dev.patrickgold.florisboard.app.ext.ExtensionListScreenType
 import dev.patrickgold.florisboard.app.ext.ExtensionViewScreen
 import dev.patrickgold.florisboard.app.settings.HomeScreen
+import dev.patrickgold.florisboard.app.settings.search.SettingsSearchScreen
 import dev.patrickgold.florisboard.app.settings.about.AboutScreen
 import dev.patrickgold.florisboard.app.settings.about.DataAttributionsScreen
 import dev.patrickgold.florisboard.app.settings.about.ProjectLicenseScreen
@@ -123,6 +124,10 @@ object Routes {
         @Serializable
         @Deeplink("settings/home")
         object Home
+
+        @Serializable
+        @Deeplink("settings/search")
+        object Search
 
         @Serializable
         @Deeplink("settings/dictate")
@@ -356,6 +361,7 @@ object Routes {
             composable<Setup.Screen> { SetupScreen() }
 
             composableWithDeepLink(Settings.Home::class) { HomeScreen() }
+            composableWithDeepLink(Settings.Search::class) { SettingsSearchScreen() }
 
             composableWithDeepLink(Settings.Dictate::class) { DictateScreen() }
             composableWithDeepLink(Settings.DictateLanguages::class) { DictateLanguagesScreen() }

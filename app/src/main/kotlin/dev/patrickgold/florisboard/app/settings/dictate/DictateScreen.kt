@@ -77,6 +77,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
@@ -287,6 +288,7 @@ fun DictateRecordingScreen() = FlorisScreen {
         SwitchPreference(
             prefs.dictate.realtimeTranscription,
             icon = Icons.Default.GraphicEq,
+            modifier = Modifier.settingsSearchAnchor("dictate__realtime_title"),
             title = stringRes(R.string.dictate__realtime_title),
             summary = stringRes(R.string.dictate__realtime_summary),
         )
@@ -310,18 +312,21 @@ fun DictateRecordingScreen() = FlorisScreen {
         SwitchPreference(
             prefs.dictate.audioFocus,
             icon = Icons.Default.VolumeOff,
+            modifier = Modifier.settingsSearchAnchor("dictate__audio_focus_title"),
             title = stringRes(R.string.dictate__audio_focus_title),
             summary = stringRes(R.string.dictate__audio_focus_summary),
         )
         SwitchPreference(
             prefs.dictate.useBluetoothMic,
             icon = Icons.Default.Bluetooth,
+            modifier = Modifier.settingsSearchAnchor("dictate__bluetooth_mic_title"),
             title = stringRes(R.string.dictate__bluetooth_mic_title),
             summary = stringRes(R.string.dictate__bluetooth_mic_summary),
         )
         ListPreference(
             prefs.dictate.audioInputSource,
             icon = Icons.Default.GraphicEq,
+            modifier = Modifier.settingsSearchAnchor("dictate__audio_source_title"),
             title = stringRes(R.string.dictate__audio_source_title),
             entries = listPrefEntries {
                 entry(
@@ -349,18 +354,21 @@ fun DictateRecordingScreen() = FlorisScreen {
         SwitchPreference(
             prefs.dictate.keepScreenAwake,
             icon = Icons.Default.BrightnessHigh,
+            modifier = Modifier.settingsSearchAnchor("dictate__keep_screen_awake_title"),
             title = stringRes(R.string.dictate__keep_screen_awake_title),
             summary = stringRes(R.string.dictate__keep_screen_awake_summary),
         )
         SwitchPreference(
             prefs.dictate.skipSilentRecordings,
             icon = Icons.Default.VolumeOff,
+            modifier = Modifier.settingsSearchAnchor("dictate__skip_silent_title"),
             title = stringRes(R.string.dictate__skip_silent_title),
             summary = stringRes(R.string.dictate__skip_silent_summary),
         )
         SwitchPreference(
             prefs.dictate.instantRecording,
             icon = Icons.Default.Bolt,
+            modifier = Modifier.settingsSearchAnchor("dictate__instant_recording_title"),
             title = stringRes(R.string.dictate__instant_recording_title),
             summary = stringRes(R.string.dictate__instant_recording_summary),
         )
@@ -415,6 +423,7 @@ fun DictateOutputScreen() = FlorisScreen {
         ListPreference(
             prefs.dictate.legacyLayout,
             icon = Icons.Default.Dialpad,
+            modifier = Modifier.settingsSearchAnchor("dictate__legacy_layout_title"),
             title = stringRes(R.string.dictate__legacy_layout_title),
             entries = listPrefEntries {
                 entry(
@@ -434,18 +443,21 @@ fun DictateOutputScreen() = FlorisScreen {
         SwitchPreference(
             prefs.dictate.autoEnter,
             icon = Icons.AutoMirrored.Filled.KeyboardReturn,
+            modifier = Modifier.settingsSearchAnchor("dictate__auto_enter_title"),
             title = stringRes(R.string.dictate__auto_enter_title),
             summary = stringRes(R.string.dictate__auto_enter_summary),
         )
         SwitchPreference(
             prefs.dictate.instantOutput,
             icon = Icons.Default.Keyboard,
+            modifier = Modifier.settingsSearchAnchor("dictate__instant_output_title"),
             title = stringRes(R.string.dictate__instant_output_title),
             summary = stringRes(R.string.dictate__instant_output_summary),
         )
         DialogSliderPreference(
             prefs.dictate.outputSpeed,
             icon = Icons.Default.Speed,
+            modifier = Modifier.settingsSearchAnchor("dictate__output_speed_title"),
             title = stringRes(R.string.dictate__output_speed_title),
             valueLabel = { stringRes(R.string.dictate__output_speed_value, "v" to it) },
             min = 1,
@@ -462,12 +474,14 @@ fun DictateOutputScreen() = FlorisScreen {
         SwitchPreference(
             prefs.dictate.hapticFeedback,
             icon = Icons.Default.Vibration,
+            modifier = Modifier.settingsSearchAnchor("dictate__haptic_feedback_title"),
             title = stringRes(R.string.dictate__haptic_feedback_title),
             summary = stringRes(R.string.dictate__haptic_feedback_summary),
         )
         SwitchPreference(
             prefs.dictate.rememberLastDictation,
             icon = Icons.Default.History,
+            modifier = Modifier.settingsSearchAnchor("dictate__remember_last_dictation_title"),
             title = stringRes(R.string.dictate__remember_last_dictation_title),
             summary = stringRes(R.string.dictate__remember_last_dictation_summary),
         )

@@ -112,6 +112,12 @@
     <string name="settings__home__title" comment="Title of the Home screen">Us donem la benvinguda a {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} no està habilitat en el sistema i, per tant, no estarà disponible com a mètode d\'entrada en el selector d\'entrada. Feu clic aquí per a resoldre aquest problema.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} no està seleccionat com a mètode d\'entrada per defecte. Feu clic aquí per a resoldre aquest problema.</string>
+    <string name="settings__search__title" comment="Title of the settings search screen">Cerca la configuració</string>
+    <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Cerca la configuració…</string>
+    <string name="settings__search__recent" comment="Header above recently used search terms">Cerques recents</string>
+    <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Esborra les cerques recents</string>
+    <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Populars</string>
+    <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">No s\'ha trobat cap configuració</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Llengües &amp; Disposicions</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Mostra els noms de les llengües en</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Mostra les etiquetes del teclat en l\'idioma del subtipus</string>

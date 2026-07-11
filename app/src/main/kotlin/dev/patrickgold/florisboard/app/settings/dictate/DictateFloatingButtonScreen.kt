@@ -41,12 +41,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.dictate.overlay.DictateAccessibilityService
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
@@ -107,6 +109,7 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
         SwitchPreference(
             prefs.dictate.floatingButtonEnabled,
             icon = Icons.Default.Adjust,
+            modifier = Modifier.settingsSearchAnchor("dictate__floating_button_enable_title"),
             title = stringRes(R.string.dictate__floating_button_enable_title),
             summary = stringRes(R.string.dictate__floating_button_enable_summary),
         )
@@ -180,6 +183,7 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
             ListPreference(
                 prefs.dictate.floatingButtonSize,
                 icon = Icons.Default.PhotoSizeSelectSmall,
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_size_title"),
                 title = stringRes(R.string.dictate__floating_button_size_title),
                 entries = listPrefEntries {
                     entry(
@@ -208,6 +212,7 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
             ColorPickerPreference(
                 prefs.dictate.floatingButtonColor,
                 icon = Icons.Default.ColorLens,
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_color_title"),
                 title = stringRes(R.string.dictate__floating_button_color_title),
                 defaultValueLabel = stringRes(R.string.action__default),
                 showAlphaSlider = false,

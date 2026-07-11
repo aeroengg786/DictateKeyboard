@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
 import dev.patrickgold.florisboard.ime.text.gestures.SwipeAction
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
@@ -42,6 +43,7 @@ fun GesturesScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.pref__glide__title)) {
             SwitchPreference(
                 prefs.glide.enabled,
+                modifier = Modifier.settingsSearchAnchor("pref__glide__enabled__label"),
                 title = stringRes(R.string.pref__glide__enabled__label),
                 summary = stringRes(R.string.pref__glide__enabled__summary),
             )
@@ -86,6 +88,7 @@ fun GesturesScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.pref__gestures__general_title)) {
             ListPreference(
                 prefs.gestures.swipeUp,
+                modifier = Modifier.settingsSearchAnchor("pref__gestures__swipe_up__label"),
                 title = stringRes(R.string.pref__gestures__swipe_up__label),
                 entries = enumDisplayEntriesOf(SwipeAction::class, "general"),
                 enabledIf = { prefs.glide.enabled isEqualTo false },
@@ -128,6 +131,7 @@ fun GesturesScreen() = FlorisScreen {
             )
             ListPreference(
                 prefs.gestures.spaceBarLongPress,
+                modifier = Modifier.settingsSearchAnchor("pref__gestures__space_bar_long_press__label"),
                 title = stringRes(R.string.pref__gestures__space_bar_long_press__label),
                 entries = enumDisplayEntriesOf(SwipeAction::class, "general"),
             )
@@ -136,6 +140,7 @@ fun GesturesScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.pref__gestures__other_title)) {
             ListPreference(
                 prefs.gestures.deleteKeySwipeLeft,
+                modifier = Modifier.settingsSearchAnchor("pref__gestures__delete_key_swipe_left__label"),
                 title = stringRes(R.string.pref__gestures__delete_key_swipe_left__label),
                 entries = enumDisplayEntriesOf(SwipeAction::class, "deleteSwipe"),
             )
