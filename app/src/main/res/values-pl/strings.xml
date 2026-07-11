@@ -1324,6 +1324,8 @@
     <string name="dictate__formatting_menu_summary">Monit stylu, własne słowa, zamiany</string>
     <string name="dictate__recording_menu_summary">Czas rzeczywisty, źródło dźwięku, natychmiastowe nagrywanie</string>
     <string name="dictate__output_menu_summary">Auto-Enter, szybkość pisania, wyślij ponownie</string>
+    <string name="dictate__layout_title">Układ dyktowania</string>
+    <string name="dictate__layout_menu_summary">Klasyczny układ i wygląd klawiatury</string>
     <string name="dictate__languages_group">Języki</string>
     <string name="dictate__languages_title">Języki transkrypcji</string>
     <string name="dictate__languages_summary">Wybierz języki, w których dyktujesz. Szybko przełączaj się między nimi na pasku nagrywania.</string>

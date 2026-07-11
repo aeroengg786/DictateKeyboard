@@ -1286,6 +1286,8 @@
     <string name="dictate__formatting_menu_summary">Stil istemi, özel sözcükler, değiştirmeler</string>
     <string name="dictate__recording_menu_summary">Gerçek zamanlı, ses kaynağı, anlık kayıt</string>
     <string name="dictate__output_menu_summary">Otomatik Enter, yazma hızı, yeniden gönder</string>
+    <string name="dictate__layout_title">Dikte düzeni</string>
+    <string name="dictate__layout_menu_summary">Klasik düzen ve klavye görünümü</string>
     <string name="dictate__languages_group">Diller</string>
     <string name="dictate__languages_title">Yazıya dökme dilleri</string>
     <string name="dictate__languages_summary">Dikte ettiğiniz dilleri seçin. Kayıt çubuğundan aralarında hızlıca geçiş yapın.</string>

@@ -138,6 +138,17 @@ fun DictateScreen() = FlorisScreen {
             onClick = { navController.navigate(Routes.Settings.DictateHistory) },
         )
 
+        // Dictation layout: its own category (issue #199) — the classic keyboard-less layout toggle
+        // today, with more layout options to follow. Kept out of Output (it changes the whole keyboard,
+        // not how text is inserted) and given top-level prominence here.
+        Preference(
+            icon = Icons.Default.Dialpad,
+            modifier = Modifier.settingsSearchAnchor("dictate__layout_title"),
+            title = stringRes(R.string.dictate__layout_title),
+            summary = stringRes(R.string.dictate__layout_menu_summary),
+            onClick = { navController.navigate(Routes.Settings.DictateLayout) },
+        )
+
         // Hub: each row opens a dedicated sub-screen (issue #153), keeping this landing page short and
         // scannable instead of one long list of every setting.
         Preference(
@@ -431,28 +442,6 @@ fun DictateOutputScreen() = FlorisScreen {
     val prefs by FlorisPreferenceStore
 
     content {
-        // Classic keyboard-less dictation layout (issue #125): a compact record-first UI, optionally
-        // with a swipe back to the modern typing keyboard.
-        ListPreference(
-            prefs.dictate.legacyLayout,
-            icon = Icons.Default.Dialpad,
-            modifier = Modifier.settingsSearchAnchor("dictate__legacy_layout_title"),
-            title = stringRes(R.string.dictate__legacy_layout_title),
-            entries = listPrefEntries {
-                entry(
-                    key = DictateLegacyLayout.OFF,
-                    label = stringRes(R.string.dictate__legacy_layout_off_label),
-                )
-                entry(
-                    key = DictateLegacyLayout.LOCKED,
-                    label = stringRes(R.string.dictate__legacy_layout_locked_label),
-                )
-                entry(
-                    key = DictateLegacyLayout.SWIPE,
-                    label = stringRes(R.string.dictate__legacy_layout_swipe_label),
-                )
-            },
-        )
         SwitchPreference(
             prefs.dictate.autoEnter,
             icon = Icons.AutoMirrored.Filled.KeyboardReturn,
@@ -498,6 +487,44 @@ fun DictateOutputScreen() = FlorisScreen {
             modifier = Modifier.settingsSearchAnchor("dictate__remember_last_dictation_title"),
             title = stringRes(R.string.dictate__remember_last_dictation_title),
             summary = stringRes(R.string.dictate__remember_last_dictation_summary),
+        )
+    }
+}
+
+/**
+ * Sub-screen (issue #199): dictation layout — how the dictation keyboard itself looks. Starts with the
+ * classic keyboard-less layout toggle; more layout options will be added here.
+ */
+@Composable
+fun DictateLayoutScreen() = FlorisScreen {
+    title = stringRes(R.string.dictate__layout_title)
+    previewFieldVisible = true
+    iconSpaceReserved = true
+
+    val prefs by FlorisPreferenceStore
+
+    content {
+        // Classic keyboard-less dictation layout (issue #125): a compact record-first UI, optionally
+        // with a swipe back to the modern typing keyboard.
+        ListPreference(
+            prefs.dictate.legacyLayout,
+            icon = Icons.Default.Dialpad,
+            modifier = Modifier.settingsSearchAnchor("dictate__legacy_layout_title"),
+            title = stringRes(R.string.dictate__legacy_layout_title),
+            entries = listPrefEntries {
+                entry(
+                    key = DictateLegacyLayout.OFF,
+                    label = stringRes(R.string.dictate__legacy_layout_off_label),
+                )
+                entry(
+                    key = DictateLegacyLayout.LOCKED,
+                    label = stringRes(R.string.dictate__legacy_layout_locked_label),
+                )
+                entry(
+                    key = DictateLegacyLayout.SWIPE,
+                    label = stringRes(R.string.dictate__legacy_layout_swipe_label),
+                )
+            },
         )
     }
 }

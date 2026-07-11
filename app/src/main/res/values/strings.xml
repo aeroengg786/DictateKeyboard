@@ -1594,6 +1594,8 @@
     <string name="dictate__formatting_menu_summary" comment="One-line summary for the formatting hub entry on the Dictate settings landing page">Style prompt, custom words, replacements</string>
     <string name="dictate__recording_menu_summary" comment="One-line summary for the recording hub entry on the Dictate settings landing page">Real-time, audio source, instant recording</string>
     <string name="dictate__output_menu_summary" comment="One-line summary for the output hub entry on the Dictate settings landing page">Auto-enter, typing speed, resend</string>
+    <string name="dictate__layout_title" comment="Title of the dictation layout settings category (how the dictation keyboard looks)">Dictation layout</string>
+    <string name="dictate__layout_menu_summary" comment="One-line summary for the dictation layout hub entry on the Dictate settings landing page">Classic layout and keyboard appearance</string>
 
     <!-- Dictate language selection -->
     <string name="dictate__languages_group" comment="Group title for dictation language settings (no longer a hub group; the languages row now lives under the Transcription group)">Languages</string>

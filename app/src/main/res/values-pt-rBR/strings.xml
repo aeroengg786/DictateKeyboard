@@ -1115,6 +1115,8 @@
     <string name="dictate__formatting_menu_summary">Prompt de estilo, palavras personalizadas, substituições</string>
     <string name="dictate__recording_menu_summary">Tempo real, fonte de áudio, gravação instantânea</string>
     <string name="dictate__output_menu_summary">Auto-Enter, velocidade de digitação, reenviar</string>
+    <string name="dictate__layout_title">Layout de ditado</string>
+    <string name="dictate__layout_menu_summary">Layout clássico e aparência do teclado</string>
     <string name="dictate__languages_group">Idiomas</string>
     <string name="dictate__languages_title">Idiomas de transcrição</string>
     <string name="dictate__languages_summary">Escolha os idiomas em que você dita. Alterne rapidamente entre eles na barra de gravação.</string>

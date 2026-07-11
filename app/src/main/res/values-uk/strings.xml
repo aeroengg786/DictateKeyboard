@@ -1152,6 +1152,8 @@
     <string name="dictate__formatting_menu_summary">Промпт стилю, власні слова, заміни</string>
     <string name="dictate__recording_menu_summary">У реальному часі, джерело звуку, миттєвий запис</string>
     <string name="dictate__output_menu_summary">Авто-Enter, швидкість набору, повторне надсилання</string>
+    <string name="dictate__layout_title">Розкладка диктування</string>
+    <string name="dictate__layout_menu_summary">Класична розкладка та вигляд клавіатури</string>
     <string name="dictate__languages_group">Мови</string>
     <string name="dictate__languages_title">Мови транскрибування</string>
     <string name="dictate__languages_summary">Виберіть мови, якими ви диктуєте. Швидко перемикайтеся між ними на панелі запису.</string>

@@ -1290,6 +1290,8 @@
     <string name="dictate__formatting_menu_summary">Indicación de estilo, palabras personalizadas, sustituciones</string>
     <string name="dictate__recording_menu_summary">Tiempo real, fuente de audio, grabación instantánea</string>
     <string name="dictate__output_menu_summary">Auto-Enter, velocidad de escritura, reenviar</string>
+    <string name="dictate__layout_title">Diseño de dictado</string>
+    <string name="dictate__layout_menu_summary">Diseño clásico y apariencia del teclado</string>
     <string name="dictate__languages_group">Idiomas</string>
     <string name="dictate__languages_title">Idiomas de transcripción</string>
     <string name="dictate__languages_summary">Elige los idiomas en los que dictas. Cambia rápidamente entre ellos desde la barra de grabación.</string>

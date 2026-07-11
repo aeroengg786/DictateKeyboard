@@ -1303,6 +1303,8 @@
     <string name="dictate__formatting_menu_summary">风格提示、自定义词语、替换</string>
     <string name="dictate__recording_menu_summary">实时、音频源、即时录音</string>
     <string name="dictate__output_menu_summary">自动回车、输入速度、重新发送</string>
+    <string name="dictate__layout_title">听写布局</string>
+    <string name="dictate__layout_menu_summary">经典布局和键盘外观</string>
     <string name="dictate__languages_group">语言</string>
     <string name="dictate__languages_title">转录语言</string>
     <string name="dictate__languages_summary">选择您听写所用的语言。可从录音栏快速切换。</string>

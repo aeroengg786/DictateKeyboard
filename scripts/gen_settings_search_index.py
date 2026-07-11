@@ -16,6 +16,7 @@ SCREEN_ROUTE = {
     "DictateFormattingScreen": "Routes.Settings.DictateFormatting",
     "DictateRecordingScreen": "Routes.Settings.DictateRecording",
     "DictateOutputScreen": "Routes.Settings.DictateOutput",
+    "DictateLayoutScreen": "Routes.Settings.DictateLayout",
     "DictateStatsScreen": "Routes.Settings.DictateStats",
     "DictateHistoryScreen": "Routes.Settings.DictateHistory",
     "DictateFloatingButtonScreen": "Routes.Settings.DictateFloatingButton",
@@ -43,7 +44,7 @@ DICTATE = "R.string.dictate__title"
 PARENT = {}
 for s in ["DictateLanguagesScreen","DictateProvidersScreen","DictateMappingsScreen","DictateProxyScreen",
           "DictateWearScreen","DictateRewordingScreen","DictateFormattingScreen","DictateRecordingScreen",
-          "DictateOutputScreen","DictateStatsScreen","DictateHistoryScreen","DictateFloatingButtonScreen",
+          "DictateOutputScreen","DictateLayoutScreen","DictateStatsScreen","DictateHistoryScreen","DictateFloatingButtonScreen",
           "DictatePromptLibraryScreen","DictatePromptsScreen"]:
     PARENT[s] = DICTATE
 for s in ["PhysicalKeyboardScreen","BackupScreen","RestoreScreen"]:
@@ -110,11 +111,15 @@ for path in sorted(glob.glob(f"{SETTINGS}/**/*.kt", recursive=True)):
             anchor = None
             am = title_alone_re.match(lines[i])
             if op in ANCHORABLE and am:
-                # ensure no existing modifier in this call (between opener and title)
-                has_mod = any("modifier =" in lines[k] for k in range(opline, i))
-                if not has_mod:
+                call = range(opline, i)
+                has_anchor = any("settingsSearchAnchor(" in lines[k] for k in call)
+                has_other_mod = any("modifier =" in lines[k] for k in call)
+                if has_anchor:
+                    anchor = key                      # already wired (idempotent re-run)
+                elif not has_other_mod:
                     anchor = key
                     insertions.setdefault(path, []).append((i, am.group(1), key))
+                # else: a non-anchor modifier is present; can't safely wire → leave unanchored
             entries.append((key, screen_title, route, parent, anchor))
 
 # also add a screen-level entry per screen (so the screen name is findable)

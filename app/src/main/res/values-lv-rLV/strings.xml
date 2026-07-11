@@ -1252,6 +1252,8 @@
     <string name="dictate__formatting_menu_summary">Stila uzvedne, pielāgoti vārdi, aizvietojumi</string>
     <string name="dictate__recording_menu_summary">Reāllaiks, audio avots, tūlītējs ieraksts</string>
     <string name="dictate__output_menu_summary">Automātisks Enter, rakstīšanas ātrums, atkārtota sūtīšana</string>
+    <string name="dictate__layout_title">Diktēšanas izkārtojums</string>
+    <string name="dictate__layout_menu_summary">Klasiskais izkārtojums un tastatūras izskats</string>
     <string name="dictate__languages_group">Valodas</string>
     <string name="dictate__languages_title">Transkribēšanas valodas</string>
     <string name="dictate__languages_summary">Izvēlieties valodas, kurās diktējat. Ātri pārslēdzieties starp tām no ierakstīšanas joslas.</string>

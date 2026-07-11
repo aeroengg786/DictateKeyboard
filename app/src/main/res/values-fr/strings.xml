@@ -1184,6 +1184,8 @@
     <string name="dictate__formatting_menu_summary">Invite de style, mots personnalisés, remplacements</string>
     <string name="dictate__recording_menu_summary">Temps réel, source audio, enregistrement instantané</string>
     <string name="dictate__output_menu_summary">Entrée auto, vitesse de frappe, renvoyer</string>
+    <string name="dictate__layout_title">Disposition de dictée</string>
+    <string name="dictate__layout_menu_summary">Disposition classique et apparence du clavier</string>
     <string name="dictate__languages_group">Langues</string>
     <string name="dictate__languages_title">Langues de transcription</string>
     <string name="dictate__languages_summary">Choisissez les langues dans lesquelles vous dictez. Basculez rapidement entre elles depuis la barre d\'enregistrement.</string>

@@ -1208,6 +1208,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__formatting_menu_summary">Stijlprompt, aangepaste woorden, vervangingen</string>
     <string name="dictate__recording_menu_summary">Realtime, audiobron, direct opnemen</string>
     <string name="dictate__output_menu_summary">Auto-enter, typesnelheid, opnieuw verzenden</string>
+    <string name="dictate__layout_title">Dicteerindeling</string>
+    <string name="dictate__layout_menu_summary">Klassieke indeling en uiterlijk van toetsenbord</string>
     <string name="dictate__languages_group">Talen</string>
     <string name="dictate__languages_title">Transcriptietalen</string>
     <string name="dictate__languages_summary">Kies de talen waarin je dicteert. Wissel er snel tussen via de opnamebalk.</string>

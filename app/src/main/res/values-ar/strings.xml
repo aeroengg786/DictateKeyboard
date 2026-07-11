@@ -1163,6 +1163,8 @@
     <string name="dictate__formatting_menu_summary">موجّه الأسلوب، كلمات مخصّصة، استبدالات</string>
     <string name="dictate__recording_menu_summary">الوقت الفعلي، مصدر الصوت، التسجيل الفوري</string>
     <string name="dictate__output_menu_summary">إدخال تلقائي، سرعة الكتابة، إعادة الإرسال</string>
+    <string name="dictate__layout_title">تخطيط الإملاء</string>
+    <string name="dictate__layout_menu_summary">التخطيط الكلاسيكي ومظهر لوحة المفاتيح</string>
     <string name="dictate__languages_group">اللغات</string>
     <string name="dictate__languages_title">لغات التفريغ النصي</string>
     <string name="dictate__languages_summary">اختر اللغات التي تُملي بها. بدّل بينها بسرعة من شريط التسجيل.</string>

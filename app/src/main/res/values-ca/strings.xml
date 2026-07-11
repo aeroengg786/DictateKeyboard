@@ -1182,6 +1182,8 @@
     <string name="dictate__formatting_menu_summary">Indicació d\'estil, paraules personalitzades, substitucions</string>
     <string name="dictate__recording_menu_summary">Temps real, font d\'àudio, gravació instantània</string>
     <string name="dictate__output_menu_summary">Retorn automàtic, velocitat d\'escriptura, reenviament</string>
+    <string name="dictate__layout_title">Disposició de dictat</string>
+    <string name="dictate__layout_menu_summary">Disposició clàssica i aparença del teclat</string>
     <string name="dictate__languages_group">Idiomes</string>
     <string name="dictate__languages_title">Idiomes de transcripció</string>
     <string name="dictate__languages_summary">Tria els idiomes en què dictes. Canvia ràpidament d\'un a l\'altre des de la barra de gravació.</string>
