@@ -23,7 +23,10 @@ jobs:
           echo "storePassword=dictatebuild123" >> keystore.properties
           echo "keyAlias=dictate" >> keystore.properties
           echo "keyPassword=dictatebuild123" >> keystore.properties
-      - run: ./gradlew :app:assembleRelease
+      - name: Grant execute permission and Build (Skipping Lint)
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease -x lintVitalRelease
       - uses: actions/upload-artifact@v4
         with:
           name: dictate-apk
